@@ -3,48 +3,63 @@
   DA FORECAST PIPELINE
 ============================================================
 
-  Time: 2026-03-31 09:55
-  Zones: LT
+  Time: 2026-03-31 10:01
+  Zones: DK_1, DK_2, NO_1, NO_2, NO_3, NO_4, NO_5, SE_1, SE_2, SE_3, SE_4, FI, DE_LU, NL, BE, FR, AT, PL, EE, LV, LT
   Mode: full pipeline
 
   Data sources:
-      DK_1: energinet
-      DK_2: energinet
-      NO_1: entsoe
-      NO_2: entsoe
-      NO_3: entsoe
-      NO_4: entsoe
-      NO_5: entsoe
-      SE_1: entsoe
-      SE_2: entsoe
-      SE_3: entsoe
-      SE_4: entsoe
-      FI: entsoe
-      DE_LU: entsoe
-      NL: entsoe
-      BE: entsoe
-      FR: entsoe
-      AT: entsoe
-      PL: entsoe
-      EE: entsoe
-      LV: entsoe
+    -> DK_1: energinet
+    -> DK_2: energinet
+    -> NO_1: entsoe
+    -> NO_2: entsoe
+    -> NO_3: entsoe
+    -> NO_4: entsoe
+    -> NO_5: entsoe
+    -> SE_1: entsoe
+    -> SE_2: entsoe
+    -> SE_3: entsoe
+    -> SE_4: entsoe
+    -> FI: entsoe
+    -> DE_LU: entsoe
+    -> NL: entsoe
+    -> BE: entsoe
+    -> FR: entsoe
+    -> AT: entsoe
+    -> PL: entsoe
+    -> EE: entsoe
+    -> LV: entsoe
     -> LT: entsoe
 
 ============================================================
-  VALIDATE -- LT (Lithuania)
+  VALIDATE -- DK_1 (West Denmark)
 ============================================================
 
-  Prices: 32807 hours (2024-01-01 -> 2026-04-01)
-  Expected ~19704 hours, got 32807 (166.5%)
-  Wind/solar gaps: 1 hours
-  Load gaps: 1 hours
-  Outliers flagged: 712 (extreme positive spikes)
-  Negative prices: 406 hours (1.2%) -- valid, not errors
-  WARNINGS: ['Wind/solar: 1 missing hours', 'Load: 1 missing hours', 'DST fall_back (2025-10-26): got 100h, expected 25h', 'DST spring_forward (2026-03-29): got 92h, expected 23h', '712 price outliers -- review before trading']
+  Prices: 8758 hours (2024-10-01 -> 2025-09-30)
+  Expected ~8760 hours, got 8758 (100.0%)
+  Wind/solar gaps: 22 hours
+  Load gaps: 14 hours
+  Outliers flagged: 98 (extreme positive spikes)
+  Negative prices: 434 hours (5.0%) -- valid, not errors
+  Imputed: 163 values forward-filled (audit log available)
+    exchange_continent_mw: 18 values
+    exchange_nordic_mw: 18 values
+    exchange_great_belt_mw: 18 values
+    wind_onshore_mw: 11 values
+    wind_offshore_mw: 11 values
+  WARNINGS: ['Wind/solar: 22 missing hours', 'Load: 14 missing hours', 'DST fall_back (2024-10-27): got 24h, expected 25h', 'DST spring_forward (2025-03-30): got 24h, expected 23h', '98 price outliers -- review before trading']
 
 ============================================================
-  FEATURES + MODEL + BACKTEST -- LT
+  FEATURES + MODEL + BACKTEST -- DK_1
 ============================================================
 
 
-  Building features for LT...
+  Building features for DK_1...
+  Feature matrix: 8560 rows x 19 columns (full (price + wind/solar + load))
+  Warmup dropped: 198 rows
+  Period: 2024-10-08 -> 2025-09-30
+
+  Train: 5992 hours (2024-10-08 -> 2025-06-15)
+  Test:  2568 hours (2025-06-15 -> 2025-09-30)
+  MAE:  21.19 EUR/MWh (baseline: 34.04, improvement: +37.8%)
+  RMSE: 30.79 EUR/MWh
+  Top 3 features: residual_load_mw (0.301), price_lag_1d (0.147), is_weekend (0.070)
