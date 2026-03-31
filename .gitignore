@@ -8,4 +8,12 @@ build/
 .ipynb_checkpoints/
 local/
 .claude/
+
+# Data caches (large files, re-fetchable)
+data/raw/**/*.parquet
 data/backtest_cache/
+data/processed/
+
+# Pipeline outputs (regenerated on each run)
+output/*.log
+output/*.json

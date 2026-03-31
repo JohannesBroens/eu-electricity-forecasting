@@ -36,7 +36,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from da_forecast.config import ZONES, ZONE_LABELS
+from da_forecast.config import (
+    ZONES, ZONE_LABELS,
+    DEFAULT_THRESHOLD_EUR, DEFAULT_TRANSACTION_COST_EUR_MWH,
+    DEFAULT_MAX_DAILY_TRADES, PRICE_RANGE_MIN, PRICE_RANGE_MAX,
+    MAX_IMPUTATION_PCT, MIN_COMPLETENESS_PCT,
+)
 from da_forecast.data import load_all, load_prices, available_zones
 from da_forecast.validation.completeness import find_gaps, daily_completeness_report
 from da_forecast.validation.outliers import detect_outliers
@@ -133,6 +138,14 @@ def step_validate(zone: str) -> dict:
                 if actual != expected:
                     warnings.append(f"DST {t['type']} ({t['date'].date()}): got {actual}h, expected {expected}h")
 
+    # Price range validation
+    p = prices["price_eur_mwh"]
+    out_of_range = ((p < PRICE_RANGE_MIN) | (p > PRICE_RANGE_MAX))
+    n_oor = int(out_of_range.sum())
+    if n_oor > 0:
+        warnings.append(f"{n_oor} prices outside [{PRICE_RANGE_MIN}, {PRICE_RANGE_MAX}] EUR/MWh")
+        log(f"  WARNING: {n_oor} prices outside expected range")
+
     # Outlier detection
     outlier_flags = detect_outliers(prices["price_eur_mwh"])
     n_outliers = int(outlier_flags["is_outlier"].sum())
@@ -143,6 +156,14 @@ def step_validate(zone: str) -> dict:
     log(f"  Negative prices: {n_negative} hours ({neg_pct:.1f}%) -- valid, not errors")
     if n_outliers > 10:
         warnings.append(f"{n_outliers} price outliers -- review before trading")
+
+    # Data quality gate
+    if completeness_pct < MIN_COMPLETENESS_PCT:
+        errors.append(f"DANGER: completeness {completeness_pct:.1f}% < {MIN_COMPLETENESS_PCT}% -- do not trade")
+    n_imputed = len(data.get("imputation_log", []))
+    imputed_pct = n_imputed / actual_hours * 100 if actual_hours > 0 else 0
+    if imputed_pct > MAX_IMPUTATION_PCT:
+        warnings.append(f"WARNING: {imputed_pct:.1f}% of hours were forward-filled (threshold: {MAX_IMPUTATION_PCT}%)")
 
     # Imputation audit
     n_imputed = len(data.get("imputation_log", []))
@@ -271,9 +292,9 @@ def step_backtest(features: pd.DataFrame, zone: str) -> dict | None:
     from da_forecast.backtest.metrics import backtest_summary
 
     strategy = ThresholdStrategy(
-        threshold_eur=5.0,
-        transaction_cost_eur_mwh=0.04,
-        max_daily_trades=12,
+        threshold_eur=DEFAULT_THRESHOLD_EUR,
+        transaction_cost_eur_mwh=DEFAULT_TRANSACTION_COST_EUR_MWH,
+        max_daily_trades=DEFAULT_MAX_DAILY_TRADES,
     )
     has_fundamentals = features.shape[1] > 14
     window = 56 if has_fundamentals else 30
@@ -524,10 +545,29 @@ def main():
         if model_result:
             model_results.append(model_result)
 
+            from da_forecast.monitoring.drift import check_drift
+            drift_status = check_drift(zone, model_result["model_mae"])
+            log(f"  Drift check: {drift_status['message']}")
+            if drift_status["is_drifting"]:
+                log(f"  WARNING: Model drift detected for {zone} -- consider retraining")
+                model_result["drift_warning"] = True
+            else:
+                model_result["drift_warning"] = False
+
         if not args.no_backtest:
             bt_result = step_backtest(features, zone)
             if bt_result:
                 backtest_results.append(bt_result)
+
+    # Persist imputation audit log
+    all_imputations = []
+    for zone, data in all_zone_data.items():
+        all_imputations.extend(data.get("imputation_log", []))
+    if all_imputations:
+        audit_df = pd.DataFrame(all_imputations)
+        audit_path = OUTPUT_DIR / "imputation_audit.csv"
+        audit_df.to_csv(audit_path, index=False)
+        log(f"\n  Imputation audit log: {audit_path} ({len(audit_df)} entries)")
 
     if not args.validate:
         generate_plots(all_zone_data, model_results, backtest_results)

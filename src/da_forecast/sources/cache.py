@@ -26,7 +26,7 @@ class ParquetCache:
             return None
         df = pd.read_parquet(path)
         # Restore inferred frequency metadata lost during Parquet round-trip
-        if isinstance(df.index, pd.DatetimeIndex) and df.index.freq is None:
+        if isinstance(df.index, pd.DatetimeIndex) and df.index.freq is None and len(df) >= 3:
             inferred = pd.infer_freq(df.index)
             if inferred:
                 df.index.freq = pd.tseries.frequencies.to_offset(inferred)

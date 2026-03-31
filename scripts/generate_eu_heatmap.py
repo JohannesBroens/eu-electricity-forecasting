@@ -316,7 +316,11 @@ def generate_maps(zone_gdf, europe_gdf, metrics_df):
     for col, title, cmap, subtitle, filename in panels:
         fig, ax = plt.subplots(figsize=(10, 10))
 
-        europe_gdf.plot(ax=ax, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3)
+        eu_clip = box(-12, 34, 35, 72)
+        europe_clipped = europe_gdf.copy()
+        europe_clipped["geometry"] = europe_clipped.geometry.intersection(eu_clip)
+        europe_clipped = europe_clipped[~europe_clipped.is_empty]
+        europe_clipped.plot(ax=ax, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3, zorder=1)
         draw_interconnectors(ax, metrics_df, alpha=0.45)
 
         if col in merged.columns:

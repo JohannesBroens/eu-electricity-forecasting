@@ -8,7 +8,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
-PROCESSED_DIR = DATA_DIR / "processed"
+PROCESSED_DIR = DATA_DIR / "processed"  # reserved for feature matrix caching (not yet wired up)
 
 # European bidding zones
 ZONES = [
@@ -159,3 +159,14 @@ DEFAULT_XGBOOST_PARAMS = {
 
 API_MAX_RETRIES = 3
 API_BACKOFF_SECONDS = [2, 4, 8]
+
+# Trading strategy defaults (used by backtest if not overridden via CLI)
+DEFAULT_THRESHOLD_EUR = 5.0
+DEFAULT_TRANSACTION_COST_EUR_MWH = 0.04  # Nord Pool day-ahead fee schedule 2025
+DEFAULT_MAX_DAILY_TRADES = 12
+
+# Data quality thresholds
+PRICE_RANGE_MIN = -500.0   # EUR/MWh — below this is flagged
+PRICE_RANGE_MAX = 3000.0   # EUR/MWh — above this is flagged
+MAX_IMPUTATION_PCT = 5.0   # warn if >5% of hours were forward-filled
+MIN_COMPLETENESS_PCT = 90.0  # warn if <90% of expected hours present

@@ -236,7 +236,12 @@ def generate_earnings_map(zone_gdf, europe_gdf, earnings_df):
 
     fig, ax = plt.subplots(figsize=(10, 10))
 
-    europe_gdf.plot(ax=ax, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3)
+    # Clip Europe to view bounds (drops overseas territories that cause rendering issues)
+    eu_clip = box(-12, 34, 35, 72)
+    europe_clipped = europe_gdf.copy()
+    europe_clipped["geometry"] = europe_clipped.geometry.intersection(eu_clip)
+    europe_clipped = europe_clipped[~europe_clipped.is_empty]
+    europe_clipped.plot(ax=ax, color="#e8e8e8", edgecolor="#cccccc", linewidth=0.3, zorder=1)
 
     # Interconnectors
     for from_z, to_z, cap in INTERCONNECTORS:
