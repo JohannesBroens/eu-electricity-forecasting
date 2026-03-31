@@ -14,6 +14,7 @@ Outputs:
 Run: uv run python scripts/generate_earnings_map.py
 """
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -64,35 +65,41 @@ ZONE_ANNUAL_COSTS = {
 }
 
 
-def parse_backtest_results(log_path: Path) -> pd.DataFrame:
-    """Parse backtest results from pipeline log."""
-    if not log_path.exists():
-        print(f"Log file not found: {log_path}")
-        print("Run the pipeline first: uv run python scripts/run_pipeline.py")
-        sys.exit(1)
+def parse_backtest_results(output_dir: Path) -> pd.DataFrame:
+    """Load backtest results from JSON (fast_backtest.py output) or pipeline log."""
+    json_path = output_dir / "backtest_summary.json"
+    log_path = output_dir / "pipeline_report.log"
 
-    text = log_path.read_text()
+    if json_path.exists():
+        with open(json_path) as f:
+            data = json.load(f)
+        rows = []
+        for r in data:
+            if r.get("status") != "ok":
+                continue
+            rows.append({
+                "zone": r["zone"],
+                "backtest_pnl": r["total_pnl"],
+                "sharpe": r["sharpe_ratio"],
+                "win_pct": r["win_rate_pct"],
+                "trades": r["n_trades"],
+                "n_test_days": r["n_test_days"],
+            })
+        if rows:
+            print(f"Loaded backtest results from {json_path}")
+            return pd.DataFrame(rows)
 
-    # Parse backtest lines like:
-    #   Backtest DK_1: P&L=198213 EUR, Sharpe=17.23, Win=88%, Trades=3616, Drawdown=...
-    pattern = r"Backtest (\w+): P&L=([\d.-]+) EUR, Sharpe=([\d.-]+), Win=(\d+)%, Trades=(\d+)"
-    matches = re.findall(pattern, text)
+    if log_path.exists():
+        text = log_path.read_text()
+        pattern = r"Backtest (\w+): P&L=([\d.-]+) EUR, Sharpe=([\d.-]+), Win=(\d+)%, Trades=(\d+)"
+        matches = re.findall(pattern, text)
+        if matches:
+            rows = [{"zone": z, "backtest_pnl": float(p), "sharpe": float(s),
+                     "win_pct": float(w), "trades": int(t)} for z, p, s, w, t in matches]
+            return pd.DataFrame(rows)
 
-    if not matches:
-        print("No backtest results found in log. Run pipeline with backtest enabled.")
-        sys.exit(1)
-
-    rows = []
-    for zone, pnl, sharpe, win, trades in matches:
-        rows.append({
-            "zone": zone,
-            "backtest_pnl": float(pnl),
-            "sharpe": float(sharpe),
-            "win_pct": float(win),
-            "trades": int(trades),
-        })
-
-    return pd.DataFrame(rows)
+    print("No backtest results found. Run fast_backtest.py or run_pipeline.py first.")
+    sys.exit(1)
 
 
 def compute_earnings(bt_df: pd.DataFrame, position_mwh: float = 10.0) -> pd.DataFrame:
@@ -112,8 +119,9 @@ def compute_earnings(bt_df: pd.DataFrame, position_mwh: float = 10.0) -> pd.Data
     """
     df = bt_df.copy()
 
-    # The backtest runs at 1 MWh. Scale to position size.
-    df["gross_annual"] = df["backtest_pnl"] * position_mwh * (365 / 214)  # ~214 test days in 7 months
+    # The backtest runs at 1 MWh. Scale to position size and annualize.
+    n_days = df["n_test_days"] if "n_test_days" in df.columns else 30
+    df["gross_annual"] = df["backtest_pnl"] * position_mwh * (365 / n_days)
 
     # Haircuts
     df["after_haircut_50pct"] = df["gross_annual"] * 0.50
@@ -292,8 +300,7 @@ def generate_earnings_map(zone_gdf, europe_gdf, earnings_df):
 
 
 def main():
-    log_path = OUTPUT_DIR / "pipeline_report.log"
-    bt_df = parse_backtest_results(log_path)
+    bt_df = parse_backtest_results(OUTPUT_DIR)
     print(f"Found backtest results for {len(bt_df)} zones")
 
     earnings_df = compute_earnings(bt_df, position_mwh=10.0)
