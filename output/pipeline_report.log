@@ -3,309 +3,48 @@
   DA FORECAST PIPELINE
 ============================================================
 
-  Time: 2026-03-27 23:51
-  Zones: DK_1, DK_2, NO_2, SE_3, SE_4, DE_LU
+  Time: 2026-03-31 09:55
+  Zones: LT
   Mode: full pipeline
 
   Data sources:
-    -> DK_1: energinet
-    -> DK_2: energinet
-    -> NO_2: entsoe
-    -> SE_3: entsoe
-    -> SE_4: entsoe
-    -> DE_LU: entsoe
+      DK_1: energinet
+      DK_2: energinet
+      NO_1: entsoe
+      NO_2: entsoe
+      NO_3: entsoe
+      NO_4: entsoe
+      NO_5: entsoe
+      SE_1: entsoe
+      SE_2: entsoe
+      SE_3: entsoe
+      SE_4: entsoe
+      FI: entsoe
+      DE_LU: entsoe
+      NL: entsoe
+      BE: entsoe
+      FR: entsoe
+      AT: entsoe
+      PL: entsoe
+      EE: entsoe
+      LV: entsoe
+    -> LT: entsoe
 
 ============================================================
-  VALIDATE -- DK_1 (West Denmark)
+  VALIDATE -- LT (Lithuania)
 ============================================================
 
-  Prices: 8758 hours (2024-10-01 -> 2025-09-30)
-  Expected ~8760 hours, got 8758 (100.0%)
-  Wind/solar gaps: 22 hours
-  Load gaps: 14 hours
-  Outliers flagged: 98 (extreme positive spikes)
-  Negative prices: 434 hours (5.0%) -- valid, not errors
-  Imputed: 163 values forward-filled (audit log available)
-    exchange_continent_mw: 18 values
-    exchange_nordic_mw: 18 values
-    exchange_great_belt_mw: 18 values
-    wind_onshore_mw: 11 values
-    wind_offshore_mw: 11 values
-  WARNINGS: ['Wind/solar: 22 missing hours', 'Load: 14 missing hours', 'DST fall_back (2024-10-27): got 24h, expected 25h', 'DST spring_forward (2025-03-30): got 24h, expected 23h', '98 price outliers -- review before trading']
+  Prices: 32807 hours (2024-01-01 -> 2026-04-01)
+  Expected ~19704 hours, got 32807 (166.5%)
+  Wind/solar gaps: 1 hours
+  Load gaps: 1 hours
+  Outliers flagged: 712 (extreme positive spikes)
+  Negative prices: 406 hours (1.2%) -- valid, not errors
+  WARNINGS: ['Wind/solar: 1 missing hours', 'Load: 1 missing hours', 'DST fall_back (2025-10-26): got 100h, expected 25h', 'DST spring_forward (2026-03-29): got 92h, expected 23h', '712 price outliers -- review before trading']
 
 ============================================================
-  FEATURES + MODEL + BACKTEST -- DK_1
-============================================================
-
-
-  Building features for DK_1...
-  Feature matrix: 8560 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 198 rows
-  Period: 2024-10-08 -> 2025-09-30
-
-  Train: 5992 hours (2024-10-08 -> 2025-06-15)
-  Test:  2568 hours (2025-06-15 -> 2025-09-30)
-  MAE:  21.19 EUR/MWh (baseline: 34.04, improvement: +37.8%)
-  RMSE: 30.79 EUR/MWh
-  Top 3 features: residual_load_mw (0.301), price_lag_1d (0.147), is_weekend (0.070)
-  Backtest DK_1: P&L=198213 EUR, Sharpe=17.23, Win=88%, Trades=3616, Drawdown=1434 EUR
-
-============================================================
-  VALIDATE -- DK_2 (East Denmark)
-============================================================
-
-  Prices: 8758 hours (2024-10-01 -> 2025-09-30)
-  Expected ~8760 hours, got 8758 (100.0%)
-  Wind/solar gaps: 22 hours
-  Load gaps: 14 hours
-  Outliers flagged: 103 (extreme positive spikes)
-  Negative prices: 269 hours (3.1%) -- valid, not errors
-  Imputed: 141 values forward-filled (audit log available)
-    exchange_continent_mw: 18 values
-    exchange_nordic_mw: 18 values
-    exchange_great_belt_mw: 18 values
-    wind_onshore_mw: 11 values
-    wind_offshore_mw: 11 values
-  WARNINGS: ['Wind/solar: 22 missing hours', 'Load: 14 missing hours', 'DST fall_back (2024-10-27): got 24h, expected 25h', 'DST spring_forward (2025-03-30): got 24h, expected 23h', '103 price outliers -- review before trading']
-
-============================================================
-  FEATURES + MODEL + BACKTEST -- DK_2
+  FEATURES + MODEL + BACKTEST -- LT
 ============================================================
 
 
-  Building features for DK_2...
-  Feature matrix: 8560 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 198 rows
-  Period: 2024-10-08 -> 2025-09-30
-
-  Train: 5992 hours (2024-10-08 -> 2025-06-15)
-  Test:  2568 hours (2025-06-15 -> 2025-09-30)
-  MAE:  24.01 EUR/MWh (baseline: 33.01, improvement: +27.3%)
-  RMSE: 33.96 EUR/MWh
-  Top 3 features: residual_load_mw (0.349), price_lag_1d (0.116), is_weekend (0.067)
-  Backtest DK_2: P&L=193396 EUR, Sharpe=17.23, Win=88%, Trades=3616, Drawdown=1582 EUR
-
-============================================================
-  VALIDATE -- NO_2 (South Norway)
-============================================================
-
-  Prices: 5137 hours (2025-03-01 -> 2025-10-01)
-  Expected ~5160 hours, got 5137 (99.6%)
-  Outliers flagged: 51 (extreme positive spikes)
-  Negative prices: 29 hours (0.6%) -- valid, not errors
-  WARNINGS: ['51 price outliers -- review before trading']
-
-============================================================
-  FEATURES + MODEL + BACKTEST -- NO_2
-============================================================
-
-
-  Building features for NO_2...
-  Feature matrix: 504 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 4633 rows
-  Period: 2025-09-10 -> 2025-09-30
-
-  Train: 352 hours (2025-09-10 -> 2025-09-24)
-  Test:  152 hours (2025-09-24 -> 2025-09-30)
-  MAE:  15.58 EUR/MWh (baseline: 19.03, improvement: +18.1%)
-  RMSE: 19.68 EUR/MWh
-  Top 3 features: price_rolling_24h_min (0.274), price_rolling_24h_max (0.149), weekday_cos (0.127)
-  Backtest for NO_2: not enough data
-
-============================================================
-  VALIDATE -- SE_3 (Central Sweden)
-============================================================
-
-  Prices: 5137 hours (2025-03-01 -> 2025-10-01)
-  Expected ~5160 hours, got 5137 (99.6%)
-  Wind/solar gaps: 24 hours
-  Outliers flagged: 89 (extreme positive spikes)
-  Negative prices: 278 hours (5.4%) -- valid, not errors
-  WARNINGS: ['Wind/solar: 24 missing hours', '89 price outliers -- review before trading']
-
-============================================================
-  FEATURES + MODEL + BACKTEST -- SE_3
-============================================================
-
-
-  Building features for SE_3...
-  Feature matrix: 4943 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 194 rows
-  Period: 2025-03-08 -> 2025-09-30
-
-  Train: 3460 hours (2025-03-08 -> 2025-07-31)
-  Test:  1483 hours (2025-07-31 -> 2025-09-30)
-  MAE:  17.66 EUR/MWh (baseline: 27.77, improvement: +36.4%)
-  RMSE: 26.06 EUR/MWh
-  Top 3 features: residual_load_mw (0.271), is_weekend (0.114), weekday_sin (0.077)
-  Backtest SE_3: P&L=50044 EUR, Sharpe=21.60, Win=86%, Trades=1769, Drawdown=357 EUR
-
-============================================================
-  VALIDATE -- SE_4 (South Sweden)
-============================================================
-
-  Prices: 5137 hours (2025-03-01 -> 2025-10-01)
-  Expected ~5160 hours, got 5137 (99.6%)
-  Wind/solar gaps: 24 hours
-  Outliers flagged: 59 (extreme positive spikes)
-  Negative prices: 301 hours (5.9%) -- valid, not errors
-  WARNINGS: ['Wind/solar: 24 missing hours', '59 price outliers -- review before trading']
-
-============================================================
-  FEATURES + MODEL + BACKTEST -- SE_4
-============================================================
-
-
-  Building features for SE_4...
-  Feature matrix: 4943 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 194 rows
-  Period: 2025-03-08 -> 2025-09-30
-
-  Train: 3460 hours (2025-03-08 -> 2025-07-31)
-  Test:  1483 hours (2025-07-31 -> 2025-09-30)
-  MAE:  26.31 EUR/MWh (baseline: 33.30, improvement: +21.0%)
-  RMSE: 35.96 EUR/MWh
-  Top 3 features: residual_load_mw (0.277), is_weekend (0.125), hour_cos (0.113)
-  Backtest SE_4: P&L=62517 EUR, Sharpe=26.06, Win=87%, Trades=1783, Drawdown=371 EUR
-
-============================================================
-  VALIDATE -- DE_LU (Germany-Luxembourg)
-============================================================
-
-  Prices: 5136 hours (2025-03-01 -> 2025-10-01)
-  Expected ~5136 hours, got 5136 (100.0%)
-  Outliers flagged: 34 (extreme positive spikes)
-  Negative prices: 511 hours (9.9%) -- valid, not errors
-  WARNINGS: ['34 price outliers -- review before trading']
-
-============================================================
-  FEATURES + MODEL + BACKTEST -- DE_LU
-============================================================
-
-
-  Building features for DE_LU...
-  Feature matrix: 4967 rows x 19 columns (full (price + wind/solar + load))
-  Warmup dropped: 169 rows
-  Period: 2025-03-08 -> 2025-09-30
-
-  Train: 3476 hours (2025-03-08 -> 2025-07-30)
-  Test:  1491 hours (2025-07-30 -> 2025-09-30)
-  MAE:  14.39 EUR/MWh (baseline: 30.15, improvement: +52.3%)
-  RMSE: 24.13 EUR/MWh
-  Top 3 features: residual_load_mw (0.577), solar_mw (0.130), hour_cos (0.046)
-  Backtest DE_LU: P&L=70610 EUR, Sharpe=25.85, Win=93%, Trades=1782, Drawdown=75 EUR
-
-============================================================
-  GENERATING PLOTS
-============================================================
-
-  Saved: output/prices_all_zones.png
-  Saved: output/feature_importance.png
-  Saved: output/backtest_pnl.png
-  Saved: output/quality_summary.png
-
-============================================================
-  SUMMARY
-============================================================
-
-  Zones processed: 6
-
-  Model performance:
-      Zone       MAE  Baseline   Improvement
-  ------------------------------------------
-      DK_1     21.19     34.04        +37.8%
-      DK_2     24.01     33.01        +27.3%
-      NO_2     15.58     19.03        +18.1%
-      SE_3     17.66     27.77        +36.4%
-      SE_4     26.31     33.30        +21.0%
-     DE_LU     14.39     30.15        +52.3%
-
-  Backtest results (with 0.04 EUR/MWh costs, max 12 trades/day):
-      Zone   P&L (EUR)    Sharpe    Win%    Trades
-  ------------------------------------------------
-      DK_1      198213     17.23     88%      3616
-      DK_2      193396     17.23     88%      3616
-      SE_3       50044     21.60     86%      1769
-      SE_4       62517     26.06     87%      1783
-     DE_LU       70610     25.85     93%      1782
-
-  Outputs saved to: /home/broens/Documents/git/eu-electricity-forecasting/output/
-  Full log: /home/broens/Documents/git/eu-electricity-forecasting/output/pipeline_report.log
-
-  Note: Sharpe ratios are calculated on daily P&L (annualized sqrt(365)).
-  Real-world strategies typically achieve Sharpe 1-3.
-  Values above 3 suggest the backtest is still optimistic
-  (no market impact, no slippage, perfect execution).
-
-============================================================
-  REVENUE ESTIMATION
-============================================================
-
-  Assumptions:
-  A1. Position sizes: 1 MW, 5 MW, 10 MW
-  A2. Trading fee: 0.04 EUR/MWh (Nord Pool fee schedule)
-  A3. No market impact (valid for small positions)
-  A4. 365 trading days/year
-  A5. Balancing/imbalance costs excluded (~5-15% drag in practice)
-  A6. Collateral costs excluded (margin capital earns 0%)
-  A7. Model haircuts: 100% / 50% / 25% of backtest P&L
-  Sources:
-    - Nord Pool fee: https://www.nordpoolgroup.com/trading/fees/
-    - Market impact threshold: ACER 2024 Wholesale Market Report
-    - Live vs backtest ratio: De Prado, 'Advances in Financial ML', Ch. 11
-
-  DK_1 (backtest: 302 days, 198213 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         239,563 EUR  1,197,813 EUR  2,395,625 EUR
-  Base case          119,781 EUR   598,906 EUR  1,197,813 EUR
-  Conservative        59,891 EUR   299,453 EUR   598,906 EUR
-                    (multiply by ~7.46 for DKK)
-
-  DK_2 (backtest: 302 days, 193396 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         233,740 EUR  1,168,700 EUR  2,337,399 EUR
-  Base case          116,870 EUR   584,350 EUR  1,168,700 EUR
-  Conservative        58,435 EUR   292,175 EUR   584,350 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_3 (backtest: 149 days, 50044 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         122,590 EUR   612,950 EUR  1,225,900 EUR
-  Base case           61,295 EUR   306,475 EUR   612,950 EUR
-  Conservative        30,648 EUR   153,238 EUR   306,475 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_4 (backtest: 149 days, 62517 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         153,146 EUR   765,730 EUR  1,531,459 EUR
-  Base case           76,573 EUR   382,865 EUR   765,730 EUR
-  Conservative        38,286 EUR   191,432 EUR   382,865 EUR
-                    (multiply by ~7.46 for DKK)
-
-  DE_LU (backtest: 150 days, 70610 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         171,817 EUR   859,085 EUR  1,718,171 EUR
-  Base case           85,909 EUR   429,543 EUR   859,085 EUR
-  Conservative        42,954 EUR   214,771 EUR   429,543 EUR
-                    (multiply by ~7.46 for DKK)
-
-  COMBINED (all 5 zones)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         997,122 EUR  4,985,612 EUR  9,971,224 EUR
-  Base case          498,561 EUR  2,492,806 EUR  4,985,612 EUR
-  Conservative       249,281 EUR  1,246,403 EUR  2,492,806 EUR
-                    (multiply by ~7.46 for DKK)
-
-  WARNING: These projections are indicative only.
-  Real-world P&L is typically 25-50% of backtest estimates due to:
-    - Model degradation on unseen market regimes
-    - Imbalance settlement costs (not modelled)
-    - Execution timing and partial fills
-    - Collateral requirements reducing deployable capital
-  The 'Base case' scenario is the most realistic starting point.
+  Building features for LT...

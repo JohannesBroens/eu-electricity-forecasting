@@ -1,6 +1,6 @@
 # Day-Ahead Electricity Price Forecasting
 
-XGBoost-based day-ahead price forecasting pipeline for European electricity bidding zones (DK1, DK2, NO2, SE3, SE4, DE-LU).
+XGBoost-based day-ahead price forecasting pipeline for 21 European electricity bidding zones across the Nordics, Baltics, and Central-West Europe.
 
 ## Architecture
 
@@ -23,7 +23,21 @@ scripts/           Data fetching + pipeline runner
 | Source | Zones | Auth | Datasets |
 |--------|-------|------|----------|
 | [Energinet DataService](https://www.energidataservice.dk/) | DK1, DK2 | None (free) | Prices, production mix, load, wind/solar forecasts |
-| [ENTSO-E Transparency](https://newtransparency.entsoe.eu/) | All EU zones | [API key](https://transparencyplatform.zendesk.com/hc/en-us/articles/12845911031188-How-to-get-security-token) | Prices, generation, load, cross-border flows |
+| [ENTSO-E Transparency](https://newtransparency.entsoe.eu/) | All 21 zones | [API key](https://transparencyplatform.zendesk.com/hc/en-us/articles/12845911031188-How-to-get-security-token) | Prices, generation, load, cross-border flows |
+
+### Supported bidding zones
+
+| Region | Zones |
+|--------|-------|
+| Denmark | DK_1 (West), DK_2 (East) |
+| Norway | NO_1 (South-East), NO_2 (South), NO_3 (Middle), NO_4 (North), NO_5 (West) |
+| Sweden | SE_1 (North), SE_2 (North-Central), SE_3 (Central), SE_4 (South) |
+| Finland | FI |
+| Germany | DE_LU (Germany-Luxembourg) |
+| Benelux | NL (Netherlands), BE (Belgium) |
+| France | FR |
+| Central Europe | AT (Austria), PL (Poland) |
+| Baltics | EE (Estonia), LV (Latvia), LT (Lithuania) |
 
 ## Quick start
 
