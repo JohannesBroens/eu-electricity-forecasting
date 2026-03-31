@@ -161,11 +161,14 @@ def load_europe_boundaries():
     for zone in ZONES:
         if zone in ZONE_TO_ISO:
             iso = ZONE_TO_ISO[zone]
+            eu_clip = box(-12, 34, 35, 72)  # clip to Europe (drops Caribbean/overseas)
             for cname, ciso in name_map.items():
                 if ciso == iso:
                     row = europe[europe["NAME"] == cname]
                     if not row.empty:
-                        zone_gdf_rows.append({"zone": zone, "geometry": row.geometry.values[0]})
+                        geom = row.geometry.values[0].intersection(eu_clip)
+                        if not geom.is_empty:
+                            zone_gdf_rows.append({"zone": zone, "geometry": geom})
                     break
             continue
 

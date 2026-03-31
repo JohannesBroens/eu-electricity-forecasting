@@ -103,8 +103,10 @@ def load_europe_boundaries():
                         row = europe[europe["NAME"] == cname]
                         break
             if not row.empty:
-                geom = row.geometry.values[0]
-                zone_gdf_rows.append({"zone": zone, "geometry": geom})
+                eu_clip = box(-12, 34, 35, 72)  # clip to Europe (drops Caribbean/overseas)
+                geom = row.geometry.values[0].intersection(eu_clip)
+                if not geom.is_empty:
+                    zone_gdf_rows.append({"zone": zone, "geometry": geom})
             continue
 
         if zone == "DE_LU":
