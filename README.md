@@ -5,17 +5,27 @@ XGBoost-based day-ahead price forecasting pipeline for 21 European electricity b
 ## Architecture
 
 ```
-data/raw/          Parquet cache (one file per source/zone/datatype)
 src/da_forecast/
-  config.py        Zone definitions, interconnectors, feature availability rules
-  data.py          Multi-source data loading with quality handling + audit logging
-  sources/         Energinet REST API + ENTSO-E Transparency Platform wrappers
-  features/        Lag features (gate-closure aware), calendar, residual load, weather
-  models/          XGBoost day-ahead forecaster (single + per-hour modes)
-  validation/      DST handling, completeness checks, outlier detection
-  backtest/        Walk-forward engine, trading strategies, Sharpe/drawdown metrics
-notebooks/         Analysis notebooks (00-09)
-scripts/           Data fetching + pipeline runner
+  config.py          Zone definitions, interconnectors, trading params, quality thresholds
+  data.py            Multi-source data loading with quality handling + audit logging
+  sources/
+    energinet.py     Energinet REST API (DK zones)
+    entsoe.py        ENTSO-E Transparency Platform (all EU zones)
+    openmeteo.py     Open-Meteo weather data (temperature, wind speed, solar irradiance)
+    cache.py         Parquet-based caching with incremental merge
+  features/          Lag features (gate-closure aware), calendar, residual load, weather
+  models/            XGBoost day-ahead forecaster (single + per-hour modes)
+  validation/
+    completeness.py  Gap detection, daily completeness reports
+    timezone.py      DST transition handling (23/25-hour days)
+    outliers.py      Rolling z-score outlier detection (negative prices preserved)
+    schema.py        DataFrame schema validation (columns, dtypes, timezone)
+  monitoring/
+    drift.py         Model performance tracking + drift detection
+  backtest/          Walk-forward engine, trading strategies, Sharpe/drawdown metrics
+notebooks/           Analysis notebooks (00-09)
+scripts/             Data fetching, pipeline runner, backtest, heatmap generation
+tests/               108 tests (pytest)
 ```
 
 ## Data sources
@@ -24,6 +34,7 @@ scripts/           Data fetching + pipeline runner
 |--------|-------|------|----------|
 | [Energinet DataService](https://www.energidataservice.dk/) | DK1, DK2 | None (free) | Prices, production mix, load, wind/solar forecasts |
 | [ENTSO-E Transparency](https://newtransparency.entsoe.eu/) | All 21 zones | [API key](https://transparencyplatform.zendesk.com/hc/en-us/articles/12845911031188-How-to-get-security-token) | Prices, generation, load, cross-border flows |
+| [Open-Meteo](https://open-meteo.com/) | All zones | None (free) | Temperature, wind speed (10m/100m), solar radiation |
 
 ### Supported bidding zones
 
@@ -48,59 +59,70 @@ cp .env.example .env  # add ENTSO-E API key if available
 # Fetch data (fetchers skip zones that already have cached data)
 uv run python scripts/fetch_energinet_data.py   # DK zones, no auth needed
 uv run python scripts/fetch_entsoe_data.py       # All zones, needs API key
+uv run python scripts/fetch_weather_data.py      # Weather data, no auth needed
 
 # Run full pipeline (all zones)
 uv run python scripts/run_pipeline.py
+
+# Fast sampled backtest (all zones in ~2 minutes)
+uv run python scripts/fast_backtest.py --minutes 3 --samples 50
+
+# Generate zone analysis maps
+uv run python scripts/generate_eu_heatmap.py
+uv run python scripts/generate_earnings_map.py
+
+# Run tests
+uv run pytest tests/ -v
 
 # Or explore via notebooks
 jupyter notebook notebooks/
 ```
 
-## Results
+## Results (Jan 2024 -- Mar 2026, 21 zones)
 
-### Model performance (March-September 2025)
+### Model performance
 
 | Zone  | MAE (EUR/MWh) | Baseline MAE | Improvement |
 |-------|:---:|:---:|:---:|
 | DK_1  | 21.19 | 34.04 | +37.8% |
 | DK_2  | 24.01 | 33.01 | +27.3% |
-| NO_2  | 15.58 | 19.03 | +18.1% |
-| SE_3  | 17.66 | 27.77 | +36.4% |
-| SE_4  | 26.31 | 33.30 | +21.0% |
-| DE_LU | 14.39 | 30.15 | +52.3% |
+| DE_LU | 13.69 | 29.40 | +53.4% |
+| NL    | 17.71 | 41.39 | +57.2% |
+| PL    | 21.31 | 55.32 | +61.5% |
+| SE_2  | 17.19 | 37.95 | +54.7% |
+| FI    | 26.84 | 52.14 | +48.5% |
 
-Baseline = naive previous-week-same-hour forecast. DE_LU has the lowest absolute error, likely because the large German market is more liquid and less volatile than the smaller Nordic zones.
+Model beats the naive same-hour-last-week baseline in 20 of 21 zones.
 
-### Walk-forward backtest (threshold strategy, 1 MWh positions)
+### Zone analysis
 
-| Zone  | P&L (EUR) | Sharpe | Win% | Trades |
-|-------|---:|:---:|:---:|---:|
-| DK_1  | 198,213 | 17.23 | 88% | 3,616 |
-| DK_2  | 193,396 | 17.23 | 88% | 3,616 |
-| SE_3  |  50,044 | 21.60 | 86% | 1,769 |
-| SE_4  |  62,517 | 26.06 | 87% | 1,783 |
-| DE_LU |  70,610 | 25.85 | 93% | 1,782 |
+![Zone attractiveness](output/eu_zone_heatmap.png)
+![Estimated earnings](output/eu_earnings_map.png)
 
-**How to read the P&L**: The backtest trades 1 MWh per position at the day-ahead auction. You do not need to hold 198K EUR upfront -- day-ahead trading is not like buying stocks. You submit bids to the auction and settle daily. The capital required is exchange membership + collateral (margin), typically 5-10% of your maximum hourly exposure.
+## Pipeline features
 
-**Sharpe ratios are unrealistically high** (real-world strategies achieve 1-3). The backtest assumes perfect execution at clearing prices, zero imbalance costs, and no model degradation over time. See notebook 09 for a detailed discussion of degradation haircuts and realistic revenue projections.
-
-### Output plots
-
-![Day-ahead prices across all zones](output/prices_all_zones.png)
-![Feature importance (DK1)](output/feature_importance.png)
-![Data quality dashboard](output/quality_summary.png)
-![Backtest P&L curves](output/backtest_pnl.png)
-
-## Key design decisions
-
+- **Data quality gates**: warns when completeness < 90%, imputation > 5%, or prices outside expected range
+- **Imputation audit log**: every forward-filled value is logged to `output/imputation_audit.csv`
+- **Schema validation**: checks column names, dtypes, and timezone awareness on all loaded data
+- **Model drift detection**: tracks daily MAE per zone, flags when 7-day rolling exceeds 2x 30-day rolling
 - **No synthetic fallback**: pipeline returns `None` rather than silently substituting fabricated data
-- **Gate-closure aware features**: all lag features shift by >=24h to respect the 12:00 CET day-ahead auction deadline
-- **Forward-fill imputation** (<=6h gaps) with full audit logging -- no interpolation, since generation has regime shifts
+- **Gate-closure aware features**: all lag features shift by >=24h to respect the 12:00 CET auction deadline
 - **Negative prices are valid**: outlier detection explicitly avoids flagging negative prices (wind surplus signal)
-- **Walk-forward backtesting** with strict temporal separation -- no look-ahead bias
-- **Multi-source reconciliation**: Energinet is authoritative for DK zones; ENTSO-E fills adjacent zones and cross-validates
+- **Walk-forward backtesting**: strict temporal separation, no look-ahead bias
+- **Fast sampled backtest**: samples evenly-spaced days with caching for quick iteration (~2 min for all zones)
+- **Multi-source reconciliation**: Energinet is authoritative for DK zones; ENTSO-E fills adjacent zones
 
-## Pipeline speed note
+## Testing
 
-The walk-forward backtest is intentionally slow: it retrains XGBoost for each test day to maintain strict temporal separation (no look-ahead bias). With 6 zones and ~200 test days each, this means ~1200 model training iterations. This is correct behavior. Use `--no-backtest` to skip the backtest for a faster pipeline run, or `--zone DK_1` to run a single zone.
+108 tests covering data loading, validation, feature engineering, model training, and backtesting:
+
+```bash
+uv run pytest tests/ -v
+```
+
+## Docker
+
+```bash
+docker build -t da-forecast .
+docker run -v ./data:/app/data -v ./output:/app/output da-forecast
+```

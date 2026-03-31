@@ -11,6 +11,7 @@ Datasets:
 Run: uv run python scripts/fetch_energinet_data.py
 """
 
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -24,8 +25,6 @@ from da_forecast.config import RAW_DIR, ENERGINET_BASE_URL
 from da_forecast.sources.cache import ParquetCache
 
 ZONES = ["DK1", "DK2"]
-START = "2025-03-01T00:00"
-END = "2025-10-01T00:00"
 RATE_LIMIT = 2.0  # seconds between requests
 
 
@@ -77,6 +76,14 @@ def fetch_chunked(dataset: str, zone: str, start: str, end: str) -> pd.DataFrame
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Fetch Danish market data from Energinet")
+    parser.add_argument("--start", default="2024-01-01T00:00", help="Start date (default: 2024-01-01)")
+    parser.add_argument("--end", default="2026-04-01T00:00", help="End date (default: 2026-04-01)")
+    args = parser.parse_args()
+
+    START = args.start
+    END = args.end
+
     print(f"Fetching Danish market data from Energinet")
     print(f"Period: {START} → {END}")
     print(f"API: {ENERGINET_BASE_URL}\n")
