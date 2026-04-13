@@ -80,19 +80,22 @@ jupyter notebook notebooks/
 
 ## Results (Jan 2024 -- Mar 2026, 21 zones)
 
-### Model performance
+### Backtest P&L (sampled days, 1 MWh positions, after transaction costs)
 
-| Zone  | MAE (EUR/MWh) | Baseline MAE | Improvement |
-|-------|:---:|:---:|:---:|
-| DK_1  | 21.19 | 34.04 | +37.8% |
-| DK_2  | 24.01 | 33.01 | +27.3% |
-| DE_LU | 13.69 | 29.40 | +53.4% |
-| NL    | 17.71 | 41.39 | +57.2% |
-| PL    | 21.31 | 55.32 | +61.5% |
-| SE_2  | 17.19 | 37.95 | +54.7% |
-| FI    | 26.84 | 52.14 | +48.5% |
+| Zone  | P&L (EUR) | Sharpe | Win% | Days tested |
+|-------|---:|:---:|:---:|:---:|
+| LV    | 59,961 | 19.30 | 82% | 78 |
+| FI    | 56,474 | 24.64 | 94% | 78 |
+| PL    | 55,471 | 19.24 | 92% | 76 |
+| DK_1  | 53,172 | 23.44 | 88% | 78 |
+| DK_2  | 53,610 | 25.02 | 88% | 78 |
+| SE_4  | 51,327 | 20.49 | 89% | 76 |
+| NL    | 44,919 | 22.40 | 93% | 76 |
+| DE_LU | 34,686 | 28.29 | 93% | 78 |
 
-Model beats the naive same-hour-last-week baseline in 20 of 21 zones.
+Sharpe ratios are unrealistically high (real-world strategies achieve 1-3). The backtest assumes perfect execution and no imbalance costs. We apply a 50% haircut for realistic revenue estimates.
+
+Full results for all 20 zones with earnings projections are in the pipeline output.
 
 ### Zone analysis
 

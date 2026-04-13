@@ -4,7 +4,7 @@
 Steps:
 1. FETCH & VALIDATE -- Load data, check quality, log issues
 2. BUILD FEATURES  -- Construct feature matrix per zone
-3. TRAIN & EVALUATE -- XGBoost model vs naive baseline
+3. TRAIN & EVALUATE -- XGBoost model training and P&L evaluation
 4. BACKTEST        -- Walk-forward with realistic constraints
 5. REPORT          -- Generate plots and quality log
 
@@ -257,24 +257,27 @@ def step_train_evaluate(features: pd.DataFrame, zone: str) -> dict | None:
     actuals = test[target].values
     predicted = predictions.values
 
-    baseline = naive_baseline(features[target]).reindex(test.index)
-    baseline_valid = baseline.dropna()
-    test_valid = test.loc[baseline_valid.index]
-
     model_mae = mae(actuals, predicted)
     model_rmse = rmse(actuals, predicted)
-    baseline_mae = mae(test_valid[target].values, baseline_valid.values)
-    improvement = (1 - model_mae / baseline_mae) * 100
 
-    log(f"  MAE:  {model_mae:.2f} EUR/MWh (baseline: {baseline_mae:.2f}, improvement: {improvement:+.1f}%)")
+    # Daily rank correlation (Corr-f) -- best single predictor of trading profit
+    test_with_pred = test[[target]].copy()
+    test_with_pred["predicted"] = predicted
+    daily_corr = test_with_pred.groupby(test_with_pred.index.date).apply(
+        lambda d: d[target].corr(d["predicted"], method="spearman") if len(d) >= 12 else float("nan")
+    )
+    corr_f = float(daily_corr.mean())
+
+    log(f"  MAE:  {model_mae:.2f} EUR/MWh")
     log(f"  RMSE: {model_rmse:.2f} EUR/MWh")
+    log(f"  Corr-f (daily rank correlation): {corr_f:.3f}  (1.0 = perfect hour ranking)")
 
     importance = forecaster.feature_importance()
     log(f"  Top 3 features: {', '.join(f'{f} ({r.importance:.3f})' for f, r in importance.head(3).iterrows())}")
 
     return {
-        "zone": zone, "model_mae": model_mae, "baseline_mae": baseline_mae,
-        "improvement": improvement, "importance": importance,
+        "zone": zone, "model_mae": model_mae, "model_rmse": model_rmse,
+        "corr_f": corr_f, "importance": importance,
         "forecaster": forecaster, "train": train, "test": test,
         "predictions": predictions,
     }
@@ -575,11 +578,11 @@ def main():
     section("SUMMARY")
     log(f"  Zones processed: {len(zones_to_run)}")
     if model_results:
-        log(f"\n  Model performance:")
-        log(f"  {'Zone':>8s}  {'MAE':>8s}  {'Baseline':>8s}  {'Improvement':>12s}")
-        log(f"  {'-'*42}")
+        log(f"\n  Model forecast accuracy:")
+        log(f"  {'Zone':>8s}  {'MAE':>8s}  {'RMSE':>8s}")
+        log(f"  {'-'*28}")
         for r in model_results:
-            log(f"  {r['zone']:>8s}  {r['model_mae']:8.2f}  {r['baseline_mae']:8.2f}  {r['improvement']:>+11.1f}%")
+            log(f"  {r['zone']:>8s}  {r['model_mae']:8.2f}  {r.get('model_rmse', 0):8.2f}")
 
     if backtest_results:
         log(f"\n  Backtest results (with 0.04 EUR/MWh costs, max 12 trades/day):")
