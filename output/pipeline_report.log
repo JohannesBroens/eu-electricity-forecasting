@@ -3,7 +3,7 @@
   DA FORECAST PIPELINE
 ============================================================
 
-  Time: 2026-03-31 13:18
+  Time: 2026-04-14 09:00
   Zones: DK_1, DK_2, NO_1, NO_2, NO_3, NO_4, NO_5, SE_1, SE_2, SE_3, SE_4, FI, DE_LU, NL, BE, FR, AT, PL, EE, LV, LT
   Mode: full pipeline
 
@@ -60,11 +60,11 @@
 
   Train: 10601 hours (2024-01-08 -> 2025-03-24)
   Test:  4544 hours (2025-03-24 -> 2025-09-30)
-  MAE:  20.20 EUR/MWh (baseline: 33.56, improvement: +39.8%)
+  MAE:  20.20 EUR/MWh
   RMSE: 27.74 EUR/MWh
+  Corr-f (daily rank correlation): 0.849  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.286), price_lag_1d (0.150), is_weekend (0.105)
-  Drift check: DK_1: not enough history for drift detection (4 observations)
-  Backtest DK_1: P&L=328370 EUR, Sharpe=18.48, Win=87%, Trades=6898, Drawdown=1434 EUR
+  Drift check: DK_1: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- DK_2 (East Denmark)
@@ -96,11 +96,11 @@
 
   Train: 10601 hours (2024-01-08 -> 2025-03-24)
   Test:  4544 hours (2025-03-24 -> 2025-09-30)
-  MAE:  22.13 EUR/MWh (baseline: 33.05, improvement: +33.0%)
+  MAE:  22.13 EUR/MWh
   RMSE: 30.47 EUR/MWh
+  Corr-f (daily rank correlation): 0.826  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.323), price_lag_1d (0.144), is_weekend (0.059)
-  Drift check: DK_2: not enough history for drift detection (3 observations)
-  Backtest DK_2: P&L=327844 EUR, Sharpe=18.83, Win=87%, Trades=6899, Drawdown=1582 EUR
+  Drift check: DK_2: not enough history for drift detection (4 observations)
 
 ============================================================
   VALIDATE -- NO_1 (South-East Norway)
@@ -127,11 +127,11 @@
 
   Train: 21575 hours (2024-01-12 -> 2025-12-25)
   Test:  9247 hours (2025-12-25 -> 2026-03-31)
-  MAE:  25.39 EUR/MWh (baseline: 26.61, improvement: +4.6%)
+  MAE:  25.39 EUR/MWh
   RMSE: 33.13 EUR/MWh
+  Corr-f (daily rank correlation): 0.466  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.257), residual_load_mw (0.147), is_weekend (0.077)
-  Drift check: NO_1: not enough history for drift detection (2 observations)
-  Backtest NO_1: P&L=273445 EUR, Sharpe=15.68, Win=87%, Trades=8285, Drawdown=505 EUR
+  Drift check: NO_1: not enough history for drift detection (3 observations)
 
 ============================================================
   VALIDATE -- NO_2 (South Norway)
@@ -155,11 +155,11 @@
 
   Train: 352 hours (2025-09-10 -> 2025-09-24)
   Test:  152 hours (2025-09-24 -> 2025-09-30)
-  MAE:  15.58 EUR/MWh (baseline: 19.03, improvement: +18.1%)
+  MAE:  15.58 EUR/MWh
   RMSE: 19.68 EUR/MWh
+  Corr-f (daily rank correlation): 0.625  (1.0 = perfect hour ranking)
   Top 3 features: price_rolling_24h_min (0.274), price_rolling_24h_max (0.149), weekday_cos (0.127)
-  Drift check: NO_2: not enough history for drift detection (1 observations)
-  Backtest for NO_2: not enough data
+  Drift check: NO_2: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- NO_3 (Middle Norway)
@@ -186,11 +186,11 @@
 
   Train: 21575 hours (2024-01-12 -> 2025-12-25)
   Test:  9247 hours (2025-12-25 -> 2026-03-31)
-  MAE:  28.34 EUR/MWh (baseline: 25.55, improvement: -10.9%)
+  MAE:  28.34 EUR/MWh
   RMSE: 37.13 EUR/MWh
+  Corr-f (daily rank correlation): 0.375  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.347), residual_load_mw (0.146), price_rolling_24h_min (0.097)
-  Drift check: NO_3: not enough history for drift detection (1 observations)
-  Backtest NO_3: P&L=180235 EUR, Sharpe=13.64, Win=91%, Trades=7341, Drawdown=873 EUR
+  Drift check: NO_3: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- NO_4 (North Norway)
@@ -217,11 +217,11 @@
 
   Train: 21575 hours (2024-01-12 -> 2025-12-25)
   Test:  9247 hours (2025-12-25 -> 2026-03-31)
-  MAE:  20.69 EUR/MWh (baseline: 33.08, improvement: +37.5%)
+  MAE:  20.69 EUR/MWh
   RMSE: 33.56 EUR/MWh
+  Corr-f (daily rank correlation): 0.297  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.331), residual_load_mw (0.188), price_rolling_24h_min (0.101)
-  Drift check: NO_4: not enough history for drift detection (1 observations)
-  Backtest NO_4: P&L=138326 EUR, Sharpe=9.71, Win=94%, Trades=5079, Drawdown=208 EUR
+  Drift check: NO_4: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- NO_5 (West Norway)
@@ -248,11 +248,11 @@
 
   Train: 21575 hours (2024-01-12 -> 2025-12-25)
   Test:  9247 hours (2025-12-25 -> 2026-03-31)
-  MAE:  19.76 EUR/MWh (baseline: 19.98, improvement: +1.1%)
+  MAE:  19.76 EUR/MWh
   RMSE: 25.87 EUR/MWh
+  Corr-f (daily rank correlation): 0.488  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.301), residual_load_mw (0.125), price_rolling_24h_min (0.092)
-  Drift check: NO_5: not enough history for drift detection (1 observations)
-  Backtest NO_5: P&L=202710 EUR, Sharpe=15.11, Win=90%, Trades=7818, Drawdown=810 EUR
+  Drift check: NO_5: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- SE_1 (North Sweden)
@@ -278,11 +278,11 @@
 
   Train: 19535 hours (2024-01-08 -> 2026-01-02)
   Test:  8373 hours (2026-01-02 -> 2026-03-31)
-  MAE:  24.16 EUR/MWh (baseline: 38.04, improvement: +36.5%)
+  MAE:  24.16 EUR/MWh
   RMSE: 36.00 EUR/MWh
+  Corr-f (daily rank correlation): 0.410  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.271), residual_load_mw (0.147), is_weekend (0.103)
-  Drift check: SE_1: not enough history for drift detection (1 observations)
-  Backtest SE_1: P&L=242625 EUR, Sharpe=13.97, Win=92%, Trades=7610, Drawdown=792 EUR
+  Drift check: SE_1: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- SE_2 (North-Central Sweden)
@@ -308,11 +308,11 @@
 
   Train: 19535 hours (2024-01-08 -> 2026-01-02)
   Test:  8373 hours (2026-01-02 -> 2026-03-31)
-  MAE:  17.19 EUR/MWh (baseline: 37.95, improvement: +54.7%)
+  MAE:  17.19 EUR/MWh
   RMSE: 26.19 EUR/MWh
+  Corr-f (daily rank correlation): 0.537  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.284), price_lag_1d (0.187), is_weekend (0.095)
-  Drift check: SE_2: not enough history for drift detection (1 observations)
-  Backtest SE_2: P&L=262376 EUR, Sharpe=14.75, Win=93%, Trades=7601, Drawdown=462 EUR
+  Drift check: SE_2: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- SE_3 (Central Sweden)
@@ -338,11 +338,11 @@
 
   Train: 18545 hours (2024-01-08 -> 2026-01-07)
   Test:  7948 hours (2026-01-07 -> 2026-03-31)
-  MAE:  25.46 EUR/MWh (baseline: 40.70, improvement: +37.4%)
+  MAE:  25.46 EUR/MWh
   RMSE: 42.86 EUR/MWh
+  Corr-f (daily rank correlation): 0.568  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.244), residual_load_mw (0.198), is_weekend (0.062)
-  Drift check: SE_3: not enough history for drift detection (1 observations)
-  Backtest SE_3: P&L=334301 EUR, Sharpe=17.88, Win=90%, Trades=8100, Drawdown=1545 EUR
+  Drift check: SE_3: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- SE_4 (South Sweden)
@@ -368,11 +368,11 @@
 
   Train: 18545 hours (2024-01-08 -> 2026-01-07)
   Test:  7948 hours (2026-01-07 -> 2026-03-31)
-  MAE:  26.70 EUR/MWh (baseline: 49.48, improvement: +46.0%)
+  MAE:  26.70 EUR/MWh
   RMSE: 38.07 EUR/MWh
+  Corr-f (daily rank correlation): 0.657  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.214), residual_load_mw (0.202), is_holiday (0.056)
-  Drift check: SE_4: not enough history for drift detection (1 observations)
-  Backtest SE_4: P&L=441493 EUR, Sharpe=20.59, Win=89%, Trades=8287, Drawdown=1382 EUR
+  Drift check: SE_4: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- FI (Finland)
@@ -399,11 +399,11 @@
 
   Train: 22831 hours (2024-01-08 -> 2025-12-20)
   Test:  9786 hours (2025-12-20 -> 2026-04-01)
-  MAE:  26.84 EUR/MWh (baseline: 52.14, improvement: +48.5%)
+  MAE:  26.84 EUR/MWh
   RMSE: 48.43 EUR/MWh
+  Corr-f (daily rank correlation): 0.628  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.296), is_weekend (0.123), hour_cos (0.078)
-  Drift check: FI: not enough history for drift detection (1 observations)
-  Backtest FI: P&L=593228 EUR, Sharpe=20.11, Win=93%, Trades=8799, Drawdown=1012 EUR
+  Drift check: FI: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- DE_LU (Germany-Luxembourg)
@@ -427,11 +427,11 @@
 
   Train: 3594 hours (2025-03-01 -> 2025-07-28)
   Test:  1541 hours (2025-07-28 -> 2025-09-30)
-  MAE:  13.69 EUR/MWh (baseline: 29.40, improvement: +53.4%)
+  MAE:  13.69 EUR/MWh
   RMSE: 23.33 EUR/MWh
+  Corr-f (daily rank correlation): 0.944  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.601), solar_mw (0.118), hour_cos (0.052)
-  Drift check: DE_LU: not enough history for drift detection (1 observations)
-  Backtest DE_LU: P&L=74799 EUR, Sharpe=25.95, Win=93%, Trades=1863, Drawdown=75 EUR
+  Drift check: DE_LU: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- NL (Netherlands)
@@ -455,11 +455,11 @@
 
   Train: 22847 hours (2024-01-08 -> 2025-12-19)
   Test:  9792 hours (2025-12-19 -> 2026-03-31)
-  MAE:  17.71 EUR/MWh (baseline: 41.39, improvement: +57.2%)
+  MAE:  17.71 EUR/MWh
   RMSE: 25.04 EUR/MWh
+  Corr-f (daily rank correlation): 0.739  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.399), is_weekend (0.069), price_lag_1d (0.066)
-  Drift check: NL: not enough history for drift detection (1 observations)
-  Backtest NL: P&L=471199 EUR, Sharpe=20.23, Win=91%, Trades=9068, Drawdown=868 EUR
+  Drift check: NL: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- BE (Belgium)
@@ -483,11 +483,11 @@
 
   Train: 13674 hours (2024-01-08 -> 2025-07-30)
   Test:  5861 hours (2025-07-30 -> 2026-03-31)
-  MAE:  20.29 EUR/MWh (baseline: 28.20, improvement: +28.1%)
+  MAE:  20.29 EUR/MWh
   RMSE: 27.59 EUR/MWh
+  Corr-f (daily rank correlation): 0.466  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.481), price_lag_1d (0.153), price_lag_7d (0.042)
-  Drift check: BE: not enough history for drift detection (1 observations)
-  Backtest BE: P&L=330548 EUR, Sharpe=23.37, Win=90%, Trades=9061, Drawdown=321 EUR
+  Drift check: BE: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- FR (France)
@@ -515,11 +515,11 @@
 
   Train: 17792 hours (2024-01-08 -> 2026-01-11)
   Test:  7626 hours (2026-01-11 -> 2026-03-31)
-  MAE:  23.92 EUR/MWh (baseline: 44.59, improvement: +46.4%)
+  MAE:  23.92 EUR/MWh
   RMSE: 30.80 EUR/MWh
+  Corr-f (daily rank correlation): 0.620  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.432), price_lag_1d (0.180), hour_cos (0.045)
-  Drift check: FR: not enough history for drift detection (1 observations)
-  Backtest FR: P&L=380757 EUR, Sharpe=23.25, Win=91%, Trades=9042, Drawdown=440 EUR
+  Drift check: FR: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- AT (Austria)
@@ -543,11 +543,11 @@
 
   Train: 22847 hours (2024-01-08 -> 2025-12-19)
   Test:  9792 hours (2025-12-19 -> 2026-03-31)
-  MAE:  21.85 EUR/MWh (baseline: 47.23, improvement: +53.7%)
+  MAE:  21.85 EUR/MWh
   RMSE: 30.97 EUR/MWh
+  Corr-f (daily rank correlation): 0.708  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.366), price_lag_1d (0.087), solar_mw (0.072)
-  Drift check: AT: not enough history for drift detection (1 observations)
-  Backtest AT: P&L=420303 EUR, Sharpe=17.36, Win=87%, Trades=9023, Drawdown=591 EUR
+  Drift check: AT: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- PL (Poland)
@@ -571,11 +571,11 @@
 
   Train: 22847 hours (2024-01-08 -> 2025-12-19)
   Test:  9792 hours (2025-12-19 -> 2026-03-31)
-  MAE:  21.31 EUR/MWh (baseline: 55.32, improvement: +61.5%)
+  MAE:  21.31 EUR/MWh
   RMSE: 31.07 EUR/MWh
+  Corr-f (daily rank correlation): 0.770  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.425), weekday_cos (0.087), price_lag_1d (0.058)
-  Drift check: PL: not enough history for drift detection (1 observations)
-  Backtest PL: P&L=552518 EUR, Sharpe=21.71, Win=93%, Trades=9059, Drawdown=413 EUR
+  Drift check: PL: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- EE (Estonia)
@@ -600,11 +600,11 @@
 
   Train: 13655 hours (2024-01-08 -> 2025-07-31)
   Test:  5853 hours (2025-07-31 -> 2026-03-31)
-  MAE:  46.71 EUR/MWh (baseline: 56.01, improvement: +16.6%)
+  MAE:  46.71 EUR/MWh
   RMSE: 65.40 EUR/MWh
+  Corr-f (daily rank correlation): 0.348  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.201), is_weekend (0.087), residual_load_mw (0.076)
-  Drift check: EE: not enough history for drift detection (1 observations)
-  Backtest EE: P&L=491508 EUR, Sharpe=20.95, Win=81%, Trades=9075, Drawdown=889 EUR
+  Drift check: EE: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- LV (Latvia)
@@ -631,11 +631,11 @@
 
   Train: 13561 hours (2024-01-08 -> 2025-07-31)
   Test:  5813 hours (2025-07-31 -> 2026-04-01)
-  MAE:  42.24 EUR/MWh (baseline: 55.32, improvement: +23.6%)
+  MAE:  42.24 EUR/MWh
   RMSE: 64.57 EUR/MWh
+  Corr-f (daily rank correlation): 0.544  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.207), residual_load_mw (0.137), is_weekend (0.057)
-  Drift check: LV: not enough history for drift detection (1 observations)
-  Backtest LV: P&L=503476 EUR, Sharpe=21.23, Win=84%, Trades=9008, Drawdown=1041 EUR
+  Drift check: LV: not enough history for drift detection (2 observations)
 
 ============================================================
   VALIDATE -- LT (Lithuania)
@@ -661,11 +661,11 @@
 
   Train: 22845 hours (2024-01-08 -> 2025-12-19)
   Test:  9792 hours (2025-12-20 -> 2026-04-01)
-  MAE:  36.87 EUR/MWh (baseline: 77.95, improvement: +52.7%)
+  MAE:  36.87 EUR/MWh
   RMSE: 52.93 EUR/MWh
+  Corr-f (daily rank correlation): 0.654  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.306), is_weekend (0.099), price_rolling_24h_max (0.065)
-  Drift check: LT: not enough history for drift detection (1 observations)
-  Backtest LT: P&L=744074 EUR, Sharpe=18.40, Win=88%, Trades=9092, Drawdown=2061 EUR
+  Drift check: LT: not enough history for drift detection (2 observations)
 
   Imputation audit log: /home/broens/Documents/git/eu-electricity-forecasting/output/imputation_audit.csv (12503 entries)
 
@@ -675,7 +675,6 @@
 
   Saved: output/prices_all_zones.png
   Saved: output/feature_importance.png
-  Saved: output/backtest_pnl.png
   Saved: output/quality_summary.png
 
 ============================================================
@@ -684,54 +683,30 @@
 
   Zones processed: 21
 
-  Model performance:
-      Zone       MAE  Baseline   Improvement
-  ------------------------------------------
-      DK_1     20.20     33.56        +39.8%
-      DK_2     22.13     33.05        +33.0%
-      NO_1     25.39     26.61         +4.6%
-      NO_2     15.58     19.03        +18.1%
-      NO_3     28.34     25.55        -10.9%
-      NO_4     20.69     33.08        +37.5%
-      NO_5     19.76     19.98         +1.1%
-      SE_1     24.16     38.04        +36.5%
-      SE_2     17.19     37.95        +54.7%
-      SE_3     25.46     40.70        +37.4%
-      SE_4     26.70     49.48        +46.0%
-        FI     26.84     52.14        +48.5%
-     DE_LU     13.69     29.40        +53.4%
-        NL     17.71     41.39        +57.2%
-        BE     20.29     28.20        +28.1%
-        FR     23.92     44.59        +46.4%
-        AT     21.85     47.23        +53.7%
-        PL     21.31     55.32        +61.5%
-        EE     46.71     56.01        +16.6%
-        LV     42.24     55.32        +23.6%
-        LT     36.87     77.95        +52.7%
-
-  Backtest results (with 0.04 EUR/MWh costs, max 12 trades/day):
-      Zone   P&L (EUR)    Sharpe    Win%    Trades
-  ------------------------------------------------
-      DK_1      328370     18.48     87%      6898
-      DK_2      327844     18.83     87%      6899
-      NO_1      273445     15.68     87%      8285
-      NO_3      180235     13.64     91%      7341
-      NO_4      138326      9.71     94%      5079
-      NO_5      202710     15.11     90%      7818
-      SE_1      242625     13.97     92%      7610
-      SE_2      262376     14.75     93%      7601
-      SE_3      334301     17.88     90%      8100
-      SE_4      441493     20.59     89%      8287
-        FI      593228     20.11     93%      8799
-     DE_LU       74799     25.95     93%      1863
-        NL      471199     20.23     91%      9068
-        BE      330548     23.37     90%      9061
-        FR      380757     23.25     91%      9042
-        AT      420303     17.36     87%      9023
-        PL      552518     21.71     93%      9059
-        EE      491508     20.95     81%      9075
-        LV      503476     21.23     84%      9008
-        LT      744074     18.40     88%      9092
+  Model forecast accuracy:
+      Zone       MAE      RMSE
+  ----------------------------
+      DK_1     20.20     27.74
+      DK_2     22.13     30.47
+      NO_1     25.39     33.13
+      NO_2     15.58     19.68
+      NO_3     28.34     37.13
+      NO_4     20.69     33.56
+      NO_5     19.76     25.87
+      SE_1     24.16     36.00
+      SE_2     17.19     26.19
+      SE_3     25.46     42.86
+      SE_4     26.70     38.07
+        FI     26.84     48.43
+     DE_LU     13.69     23.33
+        NL     17.71     25.04
+        BE     20.29     27.59
+        FR     23.92     30.80
+        AT     21.85     30.97
+        PL     21.31     31.07
+        EE     46.71     65.40
+        LV     42.24     64.57
+        LT     36.87     52.93
 
   Outputs saved to: /home/broens/Documents/git/eu-electricity-forecasting/output/
   Full log: /home/broens/Documents/git/eu-electricity-forecasting/output/pipeline_report.log
@@ -740,196 +715,3 @@
   Real-world strategies typically achieve Sharpe 1-3.
   Values above 3 suggest the backtest is still optimistic
   (no market impact, no slippage, perfect execution).
-
-============================================================
-  REVENUE ESTIMATION
-============================================================
-
-  Assumptions:
-  A1. Position sizes: 1 MW, 5 MW, 10 MW
-  A2. Trading fee: 0.04 EUR/MWh (Nord Pool fee schedule)
-  A3. No market impact (valid for small positions)
-  A4. 365 trading days/year
-  A5. Balancing/imbalance costs excluded (~5-15% drag in practice)
-  A6. Collateral costs excluded (margin capital earns 0%)
-  A7. Model haircuts: 100% / 50% / 25% of backtest P&L
-  Sources:
-    - Nord Pool fee: https://www.nordpoolgroup.com/trading/fees/
-    - Market impact threshold: ACER 2024 Wholesale Market Report
-    - Live vs backtest ratio: De Prado, 'Advances in Financial ML', Ch. 11
-
-  DK_1 (backtest: 576 days, 328370 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         208,082 EUR  1,040,408 EUR  2,080,815 EUR
-  Base case          104,041 EUR   520,204 EUR  1,040,408 EUR
-  Conservative        52,020 EUR   260,102 EUR   520,204 EUR
-                    (multiply by ~7.46 for DKK)
-
-  DK_2 (backtest: 576 days, 327844 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         207,748 EUR  1,038,741 EUR  2,077,482 EUR
-  Base case          103,874 EUR   519,370 EUR  1,038,741 EUR
-  Conservative        51,937 EUR   259,685 EUR   519,370 EUR
-                    (multiply by ~7.46 for DKK)
-
-  NO_1 (backtest: 728 days, 273445 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         137,098 EUR   685,492 EUR  1,370,983 EUR
-  Base case           68,549 EUR   342,746 EUR   685,492 EUR
-  Conservative        34,275 EUR   171,373 EUR   342,746 EUR
-                    (multiply by ~7.46 for DKK)
-
-  NO_3 (backtest: 728 days, 180235 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic          90,365 EUR   451,825 EUR   903,651 EUR
-  Base case           45,183 EUR   225,913 EUR   451,825 EUR
-  Conservative        22,591 EUR   112,956 EUR   225,913 EUR
-                    (multiply by ~7.46 for DKK)
-
-  NO_4 (backtest: 728 days, 138326 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic          69,353 EUR   346,765 EUR   693,530 EUR
-  Base case           34,677 EUR   173,383 EUR   346,765 EUR
-  Conservative        17,338 EUR    86,691 EUR   173,383 EUR
-                    (multiply by ~7.46 for DKK)
-
-  NO_5 (backtest: 728 days, 202710 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         101,634 EUR   508,168 EUR  1,016,336 EUR
-  Base case           50,817 EUR   254,084 EUR   508,168 EUR
-  Conservative        25,408 EUR   127,042 EUR   254,084 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_1 (backtest: 753 days, 242625 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         117,607 EUR   588,036 EUR  1,176,071 EUR
-  Base case           58,804 EUR   294,018 EUR   588,036 EUR
-  Conservative        29,402 EUR   147,009 EUR   294,018 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_2 (backtest: 753 days, 262376 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         127,181 EUR   635,904 EUR  1,271,808 EUR
-  Base case           63,590 EUR   317,952 EUR   635,904 EUR
-  Conservative        31,795 EUR   158,976 EUR   317,952 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_3 (backtest: 693 days, 334301 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         176,075 EUR   880,373 EUR  1,760,747 EUR
-  Base case           88,037 EUR   440,187 EUR   880,373 EUR
-  Conservative        44,019 EUR   220,093 EUR   440,187 EUR
-                    (multiply by ~7.46 for DKK)
-
-  SE_4 (backtest: 693 days, 441493 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         232,532 EUR  1,162,662 EUR  2,325,324 EUR
-  Base case          116,266 EUR   581,331 EUR  1,162,662 EUR
-  Conservative        58,133 EUR   290,666 EUR   581,331 EUR
-                    (multiply by ~7.46 for DKK)
-
-  FI (backtest: 759 days, 593228 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         285,281 EUR  1,426,405 EUR  2,852,811 EUR
-  Base case          142,641 EUR   713,203 EUR  1,426,405 EUR
-  Conservative        71,320 EUR   356,601 EUR   713,203 EUR
-                    (multiply by ~7.46 for DKK)
-
-  DE_LU (backtest: 157 days, 74799 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         173,896 EUR   869,482 EUR  1,738,963 EUR
-  Base case           86,948 EUR   434,741 EUR   869,482 EUR
-  Conservative        43,474 EUR   217,370 EUR   434,741 EUR
-                    (multiply by ~7.46 for DKK)
-
-  NL (backtest: 758 days, 471199 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         226,896 EUR  1,134,482 EUR  2,268,965 EUR
-  Base case          113,448 EUR   567,241 EUR  1,134,482 EUR
-  Conservative        56,724 EUR   283,621 EUR   567,241 EUR
-                    (multiply by ~7.46 for DKK)
-
-  BE (backtest: 758 days, 330548 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         159,169 EUR   795,844 EUR  1,591,689 EUR
-  Base case           79,584 EUR   397,922 EUR   795,844 EUR
-  Conservative        39,792 EUR   198,961 EUR   397,922 EUR
-                    (multiply by ~7.46 for DKK)
-
-  FR (backtest: 758 days, 380757 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         183,346 EUR   916,731 EUR  1,833,462 EUR
-  Base case           91,673 EUR   458,366 EUR   916,731 EUR
-  Conservative        45,837 EUR   229,183 EUR   458,366 EUR
-                    (multiply by ~7.46 for DKK)
-
-  AT (backtest: 758 days, 420303 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         202,389 EUR  1,011,943 EUR  2,023,885 EUR
-  Base case          101,194 EUR   505,971 EUR  1,011,943 EUR
-  Conservative        50,597 EUR   252,986 EUR   505,971 EUR
-                    (multiply by ~7.46 for DKK)
-
-  PL (backtest: 758 days, 552518 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         266,054 EUR  1,330,272 EUR  2,660,544 EUR
-  Base case          133,027 EUR   665,136 EUR  1,330,272 EUR
-  Conservative        66,514 EUR   332,568 EUR   665,136 EUR
-                    (multiply by ~7.46 for DKK)
-
-  EE (backtest: 757 days, 491508 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         236,988 EUR  1,184,942 EUR  2,369,884 EUR
-  Base case          118,494 EUR   592,471 EUR  1,184,942 EUR
-  Conservative        59,247 EUR   296,236 EUR   592,471 EUR
-                    (multiply by ~7.46 for DKK)
-
-  LV (backtest: 754 days, 503476 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         243,725 EUR  1,218,626 EUR  2,437,251 EUR
-  Base case          121,863 EUR   609,313 EUR  1,218,626 EUR
-  Conservative        60,931 EUR   304,656 EUR   609,313 EUR
-                    (multiply by ~7.46 for DKK)
-
-  LT (backtest: 759 days, 744074 EUR @ 1 MWh)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic         357,822 EUR  1,789,110 EUR  3,578,220 EUR
-  Base case          178,911 EUR   894,555 EUR  1,789,110 EUR
-  Conservative        89,456 EUR   447,278 EUR   894,555 EUR
-                    (multiply by ~7.46 for DKK)
-
-  COMBINED (all 20 zones)
-  Scenario                  1 MW          5 MW         10 MW
-  --------------------------------------------------------
-  Optimistic        3,821,934 EUR  19,109,670 EUR  38,219,341 EUR
-  Base case         1,910,967 EUR  9,554,835 EUR  19,109,670 EUR
-  Conservative       955,484 EUR  4,777,418 EUR  9,554,835 EUR
-                    (multiply by ~7.46 for DKK)
-
-  WARNING: These projections are indicative only.
-  Real-world P&L is typically 25-50% of backtest estimates due to:
-    - Model degradation on unseen market regimes
-    - Imbalance settlement costs (not modelled)
-    - Execution timing and partial fills
-    - Collateral requirements reducing deployable capital
-  The 'Base case' scenario is the most realistic starting point.
