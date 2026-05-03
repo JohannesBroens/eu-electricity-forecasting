@@ -148,7 +148,8 @@ class TestBacktestSummary:
         summary = backtest_summary(results)
         expected_keys = {
             "total_pnl", "daily_pnl_mean", "daily_pnl_std",
-            "sharpe_ratio", "max_drawdown", "win_rate_pct",
+            "sharpe_ratio", "sortino_ratio", "calmar_ratio", "profit_factor",
+            "max_drawdown", "win_rate_pct",
             "n_trades", "n_trading_days", "avg_win", "avg_loss",
         }
         assert expected_keys == set(summary.keys())
