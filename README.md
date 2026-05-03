@@ -97,9 +97,31 @@ Risk metrics per zone (Sharpe, Sortino, Calmar, profit factor, max drawdown) are
 
 ![Simulated P&L](output/backtest_pnl.png)
 
+### Data overview
+
+Day-ahead clearing prices across all 21 zones (weekly averages). Price levels and volatility vary significantly by region — Nordic zones show higher variance driven by hydro and wind variability.
+
+![Prices across all zones](output/prices_all_zones.png)
+
+![Data quality dashboard](output/quality_summary.png)
+
+### Feature importance
+
+Top features by XGBoost importance for DK_1. Price lags dominate, which is expected — yesterday's prices carry the most predictive signal for tomorrow. Calendar and weather features contribute but are secondary.
+
+![Feature importance](output/feature_importance.png)
+
 ### Zone analysis
 
+Zones ranked by price volatility, negative price frequency, and estimated exchange entry costs. The composite "attractiveness" score is a weighted heuristic — it does not predict profitability.
+
 ![Zone attractiveness](output/eu_zone_heatmap.png)
+
+Individual zone maps for each factor:
+
+![Volatility](output/eu_volatility_map.png)
+![Negative prices](output/eu_negative_prices_map.png)
+![Entry costs](output/eu_entry_cost_map.png)
 
 ## Pipeline features
 
