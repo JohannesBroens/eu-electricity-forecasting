@@ -78,29 +78,22 @@ uv run pytest tests/ -v
 jupyter notebook notebooks/
 ```
 
-## Results (Jan 2024 -- Mar 2026, 21 zones)
+## Backtest simulation (Jan 2024 -- Mar 2026, 21 zones)
 
-### Backtest P&L (sampled days, 1 MWh positions, after transaction costs)
+The pipeline includes a walk-forward backtest that simulates a threshold-based trading strategy using the model's predictions. **These are simulation results, not real or projected trading performance.** The backtest uses a simplistic reference price and assumes perfect execution at clearing prices -- conditions that do not hold in practice.
 
-| Zone  | P&L (EUR) | Sharpe | Win% | Days tested |
-|-------|---:|:---:|:---:|:---:|
-| LV    | 59,961 | 19.30 | 82% | 78 |
-| FI    | 56,474 | 24.64 | 94% | 78 |
-| PL    | 55,471 | 19.24 | 92% | 76 |
-| DK_1  | 53,172 | 23.44 | 88% | 78 |
-| DK_2  | 53,610 | 25.02 | 88% | 78 |
-| SE_4  | 51,327 | 20.49 | 89% | 76 |
-| NL    | 44,919 | 22.40 | 93% | 76 |
-| DE_LU | 34,686 | 28.29 | 93% | 78 |
+Key limitations (see `scripts/fast_backtest.py` for implementation):
+- Reference price is previous-day same-hour, not the actual market consensus
+- No modelling of market entry mechanics or counterparty availability
+- No imbalance costs, collateral costs, or execution slippage
+- Sharpe ratios are unrealistically high (~15-25 vs real-world 1-3)
+- Win rate alone is misleading -- always check profit factor and drawdown
 
-Sharpe ratios are unrealistically high (real-world strategies achieve 1-3). The backtest assumes perfect execution and no imbalance costs. We apply a 50% haircut for realistic revenue estimates.
-
-Full results for all 20 zones with earnings projections are in the pipeline output.
+Risk metrics per zone (Sharpe, Sortino, Calmar, profit factor, max drawdown) are available in the pipeline output.
 
 ### Zone analysis
 
 ![Zone attractiveness](output/eu_zone_heatmap.png)
-![Estimated earnings](output/eu_earnings_map.png)
 
 ## Pipeline features
 

@@ -430,7 +430,12 @@ def step_revenue_estimation(backtest_results: list[dict]):
       Base case:     50% of backtest P&L (typical live vs backtest ratio)
       Conservative:  25% of backtest P&L
     """
-    section("REVENUE ESTIMATION")
+    section("BACKTEST SCALING (SIMULATION ONLY)")
+    log("  WARNING: This section scales backtest results to different position sizes.")
+    log("  These are NOT revenue projections. Real-world results would differ")
+    log("  significantly due to market entry mechanics, counterparty availability,")
+    log("  and the fact that the backtest reference price is a simplistic proxy.")
+    log()
     log("  Assumptions:")
     log("  A1. Position sizes: 1 MW, 5 MW, 10 MW")
     log("  A2. Trading fee: 0.04 EUR/MWh (Nord Pool fee schedule)")
@@ -585,20 +590,22 @@ def main():
             log(f"  {r['zone']:>8s}  {r['model_mae']:8.2f}  {r.get('model_rmse', 0):8.2f}")
 
     if backtest_results:
-        log(f"\n  Backtest results (with 0.04 EUR/MWh costs, max 12 trades/day):")
-        log(f"  {'Zone':>8s}  {'P&L (EUR)':>10s}  {'Sharpe':>8s}  {'Win%':>6s}  {'Trades':>8s}")
-        log(f"  {'-'*48}")
+        log(f"\n  Backtest simulation (NOT real trading results):")
+        log(f"  {'Zone':>8s}  {'Sim P&L':>10s}  {'Sharpe':>8s}  {'Sortino':>8s}  {'Calmar':>8s}  {'PF':>6s}  {'MaxDD':>10s}")
+        log(f"  {'-'*72}")
         for bt in backtest_results:
             s = bt["summary"]
             log(f"  {bt['zone']:>8s}  {s['total_pnl']:>10.0f}  {s['sharpe_ratio']:>8.2f}  "
-                f"{s['win_rate_pct']:>5.0f}%  {s['n_trades']:>8d}")
+                f"{s.get('sortino_ratio', 0):>8.2f}  {s.get('calmar_ratio', 0):>8.2f}  "
+                f"{s.get('profit_factor', 0):>5.1f}  {s['max_drawdown']:>10.0f}")
 
     log(f"\n  Outputs saved to: {OUTPUT_DIR}/")
     log(f"  Full log: {log_path}")
-    log(f"\n  Note: Sharpe ratios are calculated on daily P&L (annualized sqrt(365)).")
-    log(f"  Real-world strategies typically achieve Sharpe 1-3.")
-    log(f"  Values above 3 suggest the backtest is still optimistic")
-    log(f"  (no market impact, no slippage, perfect execution).")
+    log(f"\n  IMPORTANT: These are SIMULATED results, not real or projected performance.")
+    log(f"  The backtest uses a simplistic reference price (D-1 same hour) that does")
+    log(f"  not represent actual market consensus. Real-world performance would be")
+    log(f"  significantly different. Sharpe ratios above 3 indicate the simulation")
+    log(f"  is unrealistically optimistic (real-world strategies achieve 1-3).")
 
     if backtest_results:
         step_revenue_estimation(backtest_results)

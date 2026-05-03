@@ -260,7 +260,7 @@ def generate_earnings_map(zone_gdf, europe_gdf, earnings_df):
     # Colored zones by net earnings
     merged.plot(ax=ax, column="net_base_case", cmap="RdYlGn",
                 edgecolor="black", linewidth=0.8, legend=True, zorder=3,
-                legend_kwds={"shrink": 0.5, "label": "Estimated Net Annual EUR (base case, 10 MWh/h)"})
+                legend_kwds={"shrink": 0.5, "label": "Annualized Backtest P&L (EUR, simulation only)"})
 
     # Labels with EUR value
     for _, row in earnings_df.iterrows():
@@ -293,8 +293,8 @@ def generate_earnings_map(zone_gdf, europe_gdf, earnings_df):
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.set_aspect(1.8)
-    ax.set_title("Estimated Annual Net Earnings by Zone (Base Case)\n"
-                 "50% haircut on backtest P&L, minus annual exchange costs, 10 MWh/h positions",
+    ax.set_title("Backtest Signal Strength by Zone (Simulation Only)\n"
+                 "Annualized backtest P&L at 50% haircut. Not a forecast of real returns.",
                  fontsize=12, pad=10)
     ax.set_xticks([])
     ax.set_yticks([])
@@ -316,7 +316,7 @@ def main():
     # Print summary
     ranked = earnings_df.sort_values("net_base_case", ascending=False)
     print("\n" + "=" * 95)
-    print("  ESTIMATED ANNUAL EARNINGS BY ZONE (10 MWh/h positions)")
+    print("  BACKTEST SIGNAL STRENGTH BY ZONE (10 MWh/h, simulation only)")
     print("=" * 95)
     print("  Assumptions:")
     print("    Position: 10 MWh/h | Haircut: 50% (base) / 75% (conservative)")

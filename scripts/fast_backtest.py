@@ -228,9 +228,10 @@ def main():
     ok_results = [r for r in results if r["status"] == "ok"]
 
     print(f"\n{'='*80}")
-    print(f"  SAMPLED BACKTEST RESULTS ({len(ok_results)}/{len(zones_to_run)} zones, {elapsed_total:.0f}s)")
+    print(f"  BACKTEST SIMULATION ({len(ok_results)}/{len(zones_to_run)} zones, {elapsed_total:.0f}s)")
+    print(f"  NOTE: Simulated results only. Not real or projected trading performance.")
     print(f"{'='*80}")
-    print(f"  {'Zone':>6s}  {'P&L (EUR)':>10s}  {'Sharpe':>8s}  {'Win%':>6s}  {'Trades':>8s}  {'Days':>6s}")
+    print(f"  {'Zone':>6s}  {'Sim P&L':>10s}  {'Sharpe':>8s}  {'Win%':>6s}  {'Trades':>8s}  {'Days':>6s}")
     print(f"  {'-'*52}")
 
     for r in sorted(ok_results, key=lambda x: x["total_pnl"], reverse=True):
@@ -240,8 +241,9 @@ def main():
     if ok_results:
         total_pnl = sum(r["total_pnl"] for r in ok_results)
         print(f"\n  {'TOTAL':>6s}  {total_pnl:>10,.0f}")
-        print(f"\n  Note: P&L is from sampled days only ({args.samples} per zone).")
-        print(f"  Annualized estimates require scaling by (365 / n_test_days).")
+        print(f"\n  Simulated P&L from sampled days only ({args.samples} per zone).")
+        print(f"  Uses D-1 same-hour as reference price (not actual market consensus).")
+        print(f"  Real-world results would differ significantly.")
         print(f"  Results cached in {CACHE_DIR}/ -- re-run to fill more days.")
 
     # Save summary JSON for earnings map
