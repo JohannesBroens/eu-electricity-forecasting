@@ -25,7 +25,7 @@ src/da_forecast/
   backtest/          Walk-forward engine, trading strategies, Sharpe/drawdown metrics
 notebooks/           Analysis notebooks (00-09)
 scripts/             Data fetching, pipeline runner, backtest, heatmap generation
-tests/               108 tests (pytest)
+tests/               109 tests (pytest)
 ```
 
 ## Data sources
@@ -137,7 +137,7 @@ Individual zone maps for each factor:
 
 ## Testing
 
-108 tests covering data loading, validation, feature engineering, model training, and backtesting:
+109 tests covering data loading, validation, feature engineering, model training, and backtesting:
 
 ```bash
 uv run pytest tests/ -v

@@ -395,18 +395,17 @@ def generate_plots(all_zone_data: dict, model_results: list, backtest_results: l
         comp_data = {}
         for z, d in zones_with_data.items():
             p = d["prices"]
-            # Count expected hours properly: sum actual hours per day
-            # (accounts for DST: 23h spring-forward, 25h fall-back)
-            expected = 0
-            for date in pd.date_range(p.index.min().normalize(), p.index.max().normalize(), freq="D"):
-                day_start = date.tz_localize(p.index.tz) if date.tzinfo is None else date
-                day_end = day_start + pd.Timedelta(days=1)
-                expected += int((day_end - day_start) / pd.Timedelta(hours=1))
-            comp_data[z] = len(p) / expected * 100 if expected > 0 else 0
+            # Build a complete hourly index for the date range and check coverage
+            full_idx = pd.date_range(p.index.min(), p.index.max(), freq="h")
+            expected = len(full_idx)
+            # Count how many of those hours have data (resample to hourly if sub-hourly)
+            hourly = p.resample("h").first().dropna()
+            actual = len(hourly)
+            comp_data[z] = min(actual / expected * 100, 100.0) if expected > 0 else 0
         axes[2].bar(comp_data.keys(), comp_data.values(), color="seagreen")
         axes[2].set_ylabel("% complete")
-        axes[2].set_title("Hourly Completeness")
-        axes[2].set_ylim(min(comp_data.values()) - 2, 101)
+        axes[2].set_title("Completeness")
+        axes[2].set_ylim(max(min(comp_data.values()) - 2, 0), 101)
         axes[2].tick_params(axis="x", rotation=45)
 
         plt.suptitle("Data Quality Dashboard", fontsize=14, y=1.02)

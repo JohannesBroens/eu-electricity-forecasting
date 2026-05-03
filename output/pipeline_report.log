@@ -3,7 +3,7 @@
   DA FORECAST PIPELINE
 ============================================================
 
-  Time: 2026-04-14 09:00
+  Time: 2026-05-03 22:48
   Zones: DK_1, DK_2, NO_1, NO_2, NO_3, NO_4, NO_5, SE_1, SE_2, SE_3, SE_4, FI, DE_LU, NL, BE, FR, AT, PL, EE, LV, LT
   Mode: full pipeline
 
@@ -64,7 +64,7 @@
   RMSE: 27.74 EUR/MWh
   Corr-f (daily rank correlation): 0.849  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.286), price_lag_1d (0.150), is_weekend (0.105)
-  Drift check: DK_1: not enough history for drift detection (5 observations)
+  Drift check: DK_1: model performance stable (7d=20.48, 30d=20.57)
 
 ============================================================
   VALIDATE -- DK_2 (East Denmark)
@@ -100,7 +100,7 @@
   RMSE: 30.47 EUR/MWh
   Corr-f (daily rank correlation): 0.826  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.323), price_lag_1d (0.144), is_weekend (0.059)
-  Drift check: DK_2: not enough history for drift detection (4 observations)
+  Drift check: DK_2: model performance stable (7d=22.67, 30d=22.67)
 
 ============================================================
   VALIDATE -- NO_1 (South-East Norway)
@@ -131,7 +131,7 @@
   RMSE: 33.13 EUR/MWh
   Corr-f (daily rank correlation): 0.466  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.257), residual_load_mw (0.147), is_weekend (0.077)
-  Drift check: NO_1: not enough history for drift detection (3 observations)
+  Drift check: NO_1: not enough history for drift detection (6 observations)
 
 ============================================================
   VALIDATE -- NO_2 (South Norway)
@@ -159,7 +159,7 @@
   RMSE: 19.68 EUR/MWh
   Corr-f (daily rank correlation): 0.625  (1.0 = perfect hour ranking)
   Top 3 features: price_rolling_24h_min (0.274), price_rolling_24h_max (0.149), weekday_cos (0.127)
-  Drift check: NO_2: not enough history for drift detection (2 observations)
+  Drift check: NO_2: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- NO_3 (Middle Norway)
@@ -190,7 +190,7 @@
   RMSE: 37.13 EUR/MWh
   Corr-f (daily rank correlation): 0.375  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.347), residual_load_mw (0.146), price_rolling_24h_min (0.097)
-  Drift check: NO_3: not enough history for drift detection (2 observations)
+  Drift check: NO_3: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- NO_4 (North Norway)
@@ -221,7 +221,7 @@
   RMSE: 33.56 EUR/MWh
   Corr-f (daily rank correlation): 0.297  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.331), residual_load_mw (0.188), price_rolling_24h_min (0.101)
-  Drift check: NO_4: not enough history for drift detection (2 observations)
+  Drift check: NO_4: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- NO_5 (West Norway)
@@ -252,7 +252,7 @@
   RMSE: 25.87 EUR/MWh
   Corr-f (daily rank correlation): 0.488  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.301), residual_load_mw (0.125), price_rolling_24h_min (0.092)
-  Drift check: NO_5: not enough history for drift detection (2 observations)
+  Drift check: NO_5: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- SE_1 (North Sweden)
@@ -282,7 +282,7 @@
   RMSE: 36.00 EUR/MWh
   Corr-f (daily rank correlation): 0.410  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.271), residual_load_mw (0.147), is_weekend (0.103)
-  Drift check: SE_1: not enough history for drift detection (2 observations)
+  Drift check: SE_1: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- SE_2 (North-Central Sweden)
@@ -312,7 +312,7 @@
   RMSE: 26.19 EUR/MWh
   Corr-f (daily rank correlation): 0.537  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.284), price_lag_1d (0.187), is_weekend (0.095)
-  Drift check: SE_2: not enough history for drift detection (2 observations)
+  Drift check: SE_2: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- SE_3 (Central Sweden)
@@ -342,7 +342,7 @@
   RMSE: 42.86 EUR/MWh
   Corr-f (daily rank correlation): 0.568  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.244), residual_load_mw (0.198), is_weekend (0.062)
-  Drift check: SE_3: not enough history for drift detection (2 observations)
+  Drift check: SE_3: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- SE_4 (South Sweden)
@@ -372,7 +372,7 @@
   RMSE: 38.07 EUR/MWh
   Corr-f (daily rank correlation): 0.657  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.214), residual_load_mw (0.202), is_holiday (0.056)
-  Drift check: SE_4: not enough history for drift detection (2 observations)
+  Drift check: SE_4: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- FI (Finland)
@@ -403,7 +403,7 @@
   RMSE: 48.43 EUR/MWh
   Corr-f (daily rank correlation): 0.628  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.296), is_weekend (0.123), hour_cos (0.078)
-  Drift check: FI: not enough history for drift detection (2 observations)
+  Drift check: FI: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- DE_LU (Germany-Luxembourg)
@@ -431,7 +431,7 @@
   RMSE: 23.33 EUR/MWh
   Corr-f (daily rank correlation): 0.944  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.601), solar_mw (0.118), hour_cos (0.052)
-  Drift check: DE_LU: not enough history for drift detection (2 observations)
+  Drift check: DE_LU: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- NL (Netherlands)
@@ -459,7 +459,7 @@
   RMSE: 25.04 EUR/MWh
   Corr-f (daily rank correlation): 0.739  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.399), is_weekend (0.069), price_lag_1d (0.066)
-  Drift check: NL: not enough history for drift detection (2 observations)
+  Drift check: NL: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- BE (Belgium)
@@ -487,7 +487,7 @@
   RMSE: 27.59 EUR/MWh
   Corr-f (daily rank correlation): 0.466  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.481), price_lag_1d (0.153), price_lag_7d (0.042)
-  Drift check: BE: not enough history for drift detection (2 observations)
+  Drift check: BE: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- FR (France)
@@ -519,7 +519,7 @@
   RMSE: 30.80 EUR/MWh
   Corr-f (daily rank correlation): 0.620  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.432), price_lag_1d (0.180), hour_cos (0.045)
-  Drift check: FR: not enough history for drift detection (2 observations)
+  Drift check: FR: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- AT (Austria)
@@ -547,7 +547,7 @@
   RMSE: 30.97 EUR/MWh
   Corr-f (daily rank correlation): 0.708  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.366), price_lag_1d (0.087), solar_mw (0.072)
-  Drift check: AT: not enough history for drift detection (2 observations)
+  Drift check: AT: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- PL (Poland)
@@ -575,7 +575,7 @@
   RMSE: 31.07 EUR/MWh
   Corr-f (daily rank correlation): 0.770  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.425), weekday_cos (0.087), price_lag_1d (0.058)
-  Drift check: PL: not enough history for drift detection (2 observations)
+  Drift check: PL: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- EE (Estonia)
@@ -604,7 +604,7 @@
   RMSE: 65.40 EUR/MWh
   Corr-f (daily rank correlation): 0.348  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.201), is_weekend (0.087), residual_load_mw (0.076)
-  Drift check: EE: not enough history for drift detection (2 observations)
+  Drift check: EE: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- LV (Latvia)
@@ -635,7 +635,7 @@
   RMSE: 64.57 EUR/MWh
   Corr-f (daily rank correlation): 0.544  (1.0 = perfect hour ranking)
   Top 3 features: price_lag_1d (0.207), residual_load_mw (0.137), is_weekend (0.057)
-  Drift check: LV: not enough history for drift detection (2 observations)
+  Drift check: LV: not enough history for drift detection (5 observations)
 
 ============================================================
   VALIDATE -- LT (Lithuania)
@@ -665,7 +665,7 @@
   RMSE: 52.93 EUR/MWh
   Corr-f (daily rank correlation): 0.654  (1.0 = perfect hour ranking)
   Top 3 features: residual_load_mw (0.306), is_weekend (0.099), price_rolling_24h_max (0.065)
-  Drift check: LT: not enough history for drift detection (2 observations)
+  Drift check: LT: not enough history for drift detection (5 observations)
 
   Imputation audit log: /home/broens/Documents/git/eu-electricity-forecasting/output/imputation_audit.csv (12503 entries)
 
@@ -711,7 +711,8 @@
   Outputs saved to: /home/broens/Documents/git/eu-electricity-forecasting/output/
   Full log: /home/broens/Documents/git/eu-electricity-forecasting/output/pipeline_report.log
 
-  Note: Sharpe ratios are calculated on daily P&L (annualized sqrt(365)).
-  Real-world strategies typically achieve Sharpe 1-3.
-  Values above 3 suggest the backtest is still optimistic
-  (no market impact, no slippage, perfect execution).
+  IMPORTANT: These are SIMULATED results, not real or projected performance.
+  The backtest uses a simplistic reference price (D-1 same hour) that does
+  not represent actual market consensus. Real-world performance would be
+  significantly different. Sharpe ratios above 3 indicate the simulation
+  is unrealistically optimistic (real-world strategies achieve 1-3).
