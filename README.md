@@ -78,18 +78,24 @@ uv run pytest tests/ -v
 jupyter notebook notebooks/
 ```
 
-## Backtest simulation (Jan 2024 -- Mar 2026, 21 zones)
+## Backtest simulation (Jan 2024 -- Mar 2026)
 
-The pipeline includes a walk-forward backtest that simulates a threshold-based trading strategy using the model's predictions. **These are simulation results, not real or projected trading performance.** The backtest uses a simplistic reference price and assumes perfect execution at clearing prices -- conditions that do not hold in practice.
+### What it does
 
-Key limitations (see `scripts/fast_backtest.py` for implementation):
-- Reference price is the similar-day naive (D-1 same hour on weekdays, D-7 on weekends) -- better than a random guess but still not the actual market consensus that informed participants would use
-- No modelling of market entry mechanics or counterparty availability
-- No imbalance costs, collateral costs, or execution slippage
-- Sharpe ratios are unrealistically high (~15-25 vs real-world 1-3)
-- Win rate alone is misleading -- always check profit factor and drawdown
+The pipeline includes a walk-forward backtest. Each day, the model is retrained on a rolling window of past data (no look-ahead), predicts 24 hourly prices for the next day, then a rank-spread strategy buys the 4 hours the model predicts cheapest and sells the 4 hours it predicts most expensive. P&L comes from the actual price spread between those hours.
 
-Risk metrics per zone (Sharpe, Sortino, Calmar, profit factor, max drawdown) are available in the pipeline output.
+This tests one specific question: **does the model rank hours within a day better than random?** If the model correctly identifies which hours are cheap and which are expensive, the spread is positive.
+
+### What it does NOT tell you
+
+- Whether this strategy would work in practice. Real trading involves market entry mechanics, counterparty availability, and execution details that are not modelled here.
+- Whether the model knows something the market doesn't. The backtest measures ranking accuracy against realised prices, but in practice you're competing against other participants who have access to similar data and models.
+- What the actual P&L would be. The simulation uses the daily mean of actual prices as the settlement reference. Real settlement depends on contract structure, exchange mechanics, and the specific positions you can actually enter.
+- Risk-adjusted viability. Sharpe ratios from the simulation are unrealistically high compared to real-world strategies (which typically achieve 1-3). Win rate alone is meaningless -- a 90% win rate strategy can still lose money if the 10% losses are large enough.
+
+Risk metrics per zone (Sharpe, Sortino, Calmar, profit factor, max drawdown) are available in the pipeline output. These describe the simulation, not expected real-world performance.
+
+![Simulated P&L](output/backtest_pnl.png)
 
 ### Zone analysis
 
