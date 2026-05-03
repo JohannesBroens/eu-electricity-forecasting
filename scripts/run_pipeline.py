@@ -410,99 +410,6 @@ def generate_plots(all_zone_data: dict, model_results: list, backtest_results: l
         log(f"  Saved: output/quality_summary.png")
 
 
-# ---------------------------------------------------------------------------
-# Revenue estimation
-# ---------------------------------------------------------------------------
-def step_revenue_estimation(backtest_results: list[dict]):
-    """Project annual revenue from backtest results under explicit assumptions.
-
-    Assumptions:
-      A1. Position size: 1 / 5 / 10 MW (= MWh per hour in day-ahead)
-      A2. Trading fee: 0.04 EUR/MWh (Nord Pool day-ahead fee schedule 2025)
-      A3. No market impact on clearing prices (valid for <50 MW positions)
-      A4. Trading 365 days/year (electricity markets clear every day)
-      A5. No balancing/imbalance costs (~5-15% drag in practice)
-      A6. No collateral/margin costs
-      A7. Model performance degrades out-of-sample vs backtest
-
-    Haircut scenarios for A7:
-      Optimistic:   100% of backtest P&L
-      Base case:     50% of backtest P&L (typical live vs backtest ratio)
-      Conservative:  25% of backtest P&L
-    """
-    section("BACKTEST SCALING (SIMULATION ONLY)")
-    log("  WARNING: This section scales backtest results to different position sizes.")
-    log("  These are NOT revenue projections. Real-world results would differ")
-    log("  significantly due to market entry mechanics, counterparty availability,")
-    log("  and the fact that the backtest reference price is a simplistic proxy.")
-    log()
-    log("  Assumptions:")
-    log("  A1. Position sizes: 1 MW, 5 MW, 10 MW")
-    log("  A2. Trading fee: 0.04 EUR/MWh (Nord Pool fee schedule)")
-    log("  A3. No market impact (valid for small positions)")
-    log("  A4. 365 trading days/year")
-    log("  A5. Balancing/imbalance costs excluded (~5-15% drag in practice)")
-    log("  A6. Collateral costs excluded (margin capital earns 0%)")
-    log("  A7. Model haircuts: 100% / 50% / 25% of backtest P&L")
-    log("  Sources:")
-    log("    - Nord Pool fee: https://www.nordpoolgroup.com/trading/fees/")
-    log("    - Market impact threshold: ACER 2024 Wholesale Market Report")
-    log("    - Live vs backtest ratio: De Prado, 'Advances in Financial ML', Ch. 11")
-    log()
-
-    position_sizes = [1, 5, 10]
-    haircuts = [("Optimistic", 1.0), ("Base case", 0.5), ("Conservative", 0.25)]
-
-    for bt in backtest_results:
-        zone = bt["zone"]
-        s = bt["summary"]
-        backtest_pnl_per_mwh = s["total_pnl"]
-        n_days = s["n_trading_days"]
-
-        if n_days == 0:
-            continue
-
-        annual_factor = 365.0 / n_days
-
-        log(f"  {zone} (backtest: {n_days} days, {backtest_pnl_per_mwh:.0f} EUR @ 1 MWh)")
-        log(f"  {'Scenario':<16s}  {'1 MW':>12s}  {'5 MW':>12s}  {'10 MW':>12s}")
-        log(f"  {'-'*56}")
-
-        for scenario_name, factor in haircuts:
-            row = f"  {scenario_name:<16s}"
-            for mw in position_sizes:
-                annual_eur = backtest_pnl_per_mwh * annual_factor * mw * factor
-                row += f"  {annual_eur:>8,.0f} EUR"
-            log(row)
-
-        log(f"  {'':16s}  (multiply by ~7.46 for DKK)")
-        log()
-
-    if len(backtest_results) > 1:
-        total_pnl = sum(bt["summary"]["total_pnl"] for bt in backtest_results)
-        avg_days = np.mean([bt["summary"]["n_trading_days"] for bt in backtest_results])
-        annual_factor = 365.0 / avg_days if avg_days > 0 else 0
-
-        log(f"  COMBINED (all {len(backtest_results)} zones)")
-        log(f"  {'Scenario':<16s}  {'1 MW':>12s}  {'5 MW':>12s}  {'10 MW':>12s}")
-        log(f"  {'-'*56}")
-        for scenario_name, factor in haircuts:
-            row = f"  {scenario_name:<16s}"
-            for mw in position_sizes:
-                annual_eur = total_pnl * annual_factor * mw * factor
-                row += f"  {annual_eur:>8,.0f} EUR"
-            log(row)
-        log(f"  {'':16s}  (multiply by ~7.46 for DKK)")
-        log()
-
-    log("  WARNING: These projections are indicative only.")
-    log("  Real-world P&L is typically 25-50% of backtest estimates due to:")
-    log("    - Model degradation on unseen market regimes")
-    log("    - Imbalance settlement costs (not modelled)")
-    log("    - Execution timing and partial fills")
-    log("    - Collateral requirements reducing deployable capital")
-    log("  The 'Base case' scenario is the most realistic starting point.")
-
 
 # ---------------------------------------------------------------------------
 # Main
@@ -606,9 +513,6 @@ def main():
     log(f"  not represent actual market consensus. Real-world performance would be")
     log(f"  significantly different. Sharpe ratios above 3 indicate the simulation")
     log(f"  is unrealistically optimistic (real-world strategies achieve 1-3).")
-
-    if backtest_results:
-        step_revenue_estimation(backtest_results)
 
 
 if __name__ == "__main__":

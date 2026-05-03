@@ -69,7 +69,6 @@ uv run python scripts/fast_backtest.py --minutes 3 --samples 50
 
 # Generate zone analysis maps
 uv run python scripts/generate_eu_heatmap.py
-uv run python scripts/generate_earnings_map.py
 
 # Run tests
 uv run pytest tests/ -v
