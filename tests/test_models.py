@@ -70,19 +70,32 @@ class TestSMAPE:
 
 
 class TestNaiveBaseline:
-    def test_shifts_by_168_hours(self):
+    def test_weekday_uses_d1(self):
+        # Wednesday 2025-01-08 should use Tuesday 2025-01-07 (D-1)
+        idx = pd.date_range("2025-01-06", periods=72, freq="h", tz=TZ)
+        prices = pd.Series(np.arange(72, dtype=float), index=idx)
+        baseline = naive_baseline(prices)
+        # Hour 24 (Tue 00:00) should use hour 0 (Mon 00:00) -- Mon uses D-7 so NaN
+        # Hour 48 (Wed 00:00) should use hour 24 (Tue 00:00) = 24.0
+        assert baseline.iloc[48] == pytest.approx(24.0)
+
+    def test_weekend_uses_d7(self):
+        # Saturday should use previous Saturday (D-7, shift 168)
         idx = pd.date_range("2025-01-01", periods=336, freq="h", tz=TZ)
         prices = pd.Series(np.arange(336, dtype=float), index=idx)
         baseline = naive_baseline(prices)
-        # Hour 168 should equal hour 0
-        assert baseline.iloc[168] == pytest.approx(0.0)
-        assert baseline.iloc[169] == pytest.approx(1.0)
+        # 2025-01-01 is Wednesday. Saturday = day 3 = hour 72.
+        # Saturday uses D-7 = shift(168), so hour 72+168=240 refs hour 72
+        # But hour 72 is within first 168 hours, so D-7 is NaN
+        # Check hour 240 (Saturday Jan 11) -> should ref hour 72 (Saturday Jan 4)
+        assert baseline.iloc[240] == pytest.approx(72.0)
 
-    def test_first_168_hours_are_nan(self):
-        idx = pd.date_range("2025-01-01", periods=336, freq="h", tz=TZ)
-        prices = pd.Series(np.ones(336), index=idx)
+    def test_first_24_hours_are_nan(self):
+        # D-1 needs at least 24 hours of history
+        idx = pd.date_range("2025-01-07", periods=48, freq="h", tz=TZ)  # Tuesday
+        prices = pd.Series(np.ones(48), index=idx)
         baseline = naive_baseline(prices)
-        assert baseline.iloc[:168].isna().all()
+        assert baseline.iloc[:24].isna().all()
 
 
 class TestEvaluationReport:

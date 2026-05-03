@@ -1,12 +1,15 @@
-"""Tests for BacktestEngine, ThresholdStrategy, and backtest metrics."""
+"""Tests for BacktestEngine, RankSpreadStrategy, and backtest metrics."""
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from da_forecast.backtest.strategies import ThresholdStrategy
+from da_forecast.backtest.strategies import RankSpreadStrategy
 from da_forecast.backtest.metrics import (
     sharpe_ratio,
+    sortino_ratio,
+    calmar_ratio,
+    profit_factor,
     max_drawdown,
     win_rate,
     backtest_summary,
@@ -17,62 +20,64 @@ from da_forecast.backtest.engine import BacktestEngine
 TZ = "Europe/Copenhagen"
 
 
-# --- ThresholdStrategy ---
+# --- RankSpreadStrategy ---
 
-class TestThresholdStrategy:
-    def test_buy_signal_above_threshold(self):
+class TestRankSpreadStrategy:
+    def test_buys_cheapest_sells_most_expensive(self):
         idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
-        predictions = pd.Series(60.0, index=idx)
-        baseline = pd.Series(50.0, index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0, position_mwh=1.0)
-        signals = strategy.generate_signals(predictions, baseline)
-        # Diff = +10, above threshold -> all buy (+1.0)
-        assert (signals == 1.0).all()
+        # Clear ranking: hours 0-3 cheapest, hours 20-23 most expensive
+        prices = pd.Series(np.arange(24, dtype=float) * 10, index=idx)
+        strategy = RankSpreadStrategy(n_long=4, n_short=4, position_mwh=1.0, transaction_cost_eur_mwh=0.0)
+        signals = strategy.generate_signals(prices)
+        assert (signals.iloc[:4] == 1.0).all()    # buy cheapest 4
+        assert (signals.iloc[20:] == -1.0).all()   # sell most expensive 4
+        assert (signals.iloc[4:20] == 0.0).all()   # hold middle hours
 
-    def test_sell_signal_below_threshold(self):
+    def test_balanced_positions(self):
         idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
-        predictions = pd.Series(40.0, index=idx)
-        baseline = pd.Series(50.0, index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0, position_mwh=1.0)
-        signals = strategy.generate_signals(predictions, baseline)
-        # Diff = -10, below -threshold -> all sell (-1.0)
-        assert (signals == -1.0).all()
+        prices = pd.Series(np.random.randn(24), index=idx)
+        strategy = RankSpreadStrategy(n_long=4, n_short=4)
+        signals = strategy.generate_signals(prices)
+        n_long = (signals > 0).sum()
+        n_short = (signals < 0).sum()
+        assert n_long == 4
+        assert n_short == 4
 
-    def test_no_signal_within_threshold(self):
+    def test_pnl_positive_when_ranking_correct(self):
         idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
-        predictions = pd.Series(52.0, index=idx)
-        baseline = pd.Series(50.0, index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0)
-        signals = strategy.generate_signals(predictions, baseline)
-        # Diff = +2, within threshold -> hold (0.0)
-        assert (signals == 0.0).all()
+        # Predictions match actuals perfectly -> ranking is correct -> profit
+        actuals = pd.Series(np.arange(24, dtype=float) * 10, index=idx)
+        predictions = actuals.copy()
+        strategy = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0)
+        pnl = strategy.compute_pnl(predictions, actuals)
+        assert pnl.sum() > 0
 
-    def test_mixed_signals(self):
-        idx = pd.date_range("2025-01-06", periods=3, freq="h", tz=TZ)
-        predictions = pd.Series([60.0, 50.0, 40.0], index=idx)
-        baseline = pd.Series([50.0, 50.0, 50.0], index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0)
-        signals = strategy.generate_signals(predictions, baseline)
-        assert signals.iloc[0] == 1.0   # buy
-        assert signals.iloc[1] == 0.0   # hold
-        assert signals.iloc[2] == -1.0  # sell
-
-    def test_max_daily_trades_limits_signals(self):
+    def test_pnl_negative_when_ranking_reversed(self):
         idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
-        predictions = pd.Series(60.0, index=idx)
-        baseline = pd.Series(50.0, index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0, max_daily_trades=5)
-        signals = strategy.generate_signals(predictions, baseline)
-        active_trades = (signals != 0).sum()
-        assert active_trades == 5
+        actuals = pd.Series(np.arange(24, dtype=float) * 10, index=idx)
+        # Predictions are reversed: model thinks cheap hours are expensive
+        predictions = pd.Series(np.arange(23, -1, -1, dtype=float) * 10, index=idx)
+        strategy = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0)
+        pnl = strategy.compute_pnl(predictions, actuals)
+        assert pnl.sum() < 0
+
+    def test_transaction_costs_reduce_pnl(self):
+        idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
+        actuals = pd.Series(np.arange(24, dtype=float) * 10, index=idx)
+        predictions = actuals.copy()
+        s_free = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0)
+        s_cost = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=5.0)
+        pnl_free = s_free.compute_pnl(predictions, actuals).sum()
+        pnl_cost = s_cost.compute_pnl(predictions, actuals).sum()
+        assert pnl_cost < pnl_free
 
     def test_custom_position_size(self):
         idx = pd.date_range("2025-01-06", periods=24, freq="h", tz=TZ)
-        predictions = pd.Series(60.0, index=idx)
-        baseline = pd.Series(50.0, index=idx)
-        strategy = ThresholdStrategy(threshold_eur=5.0, position_mwh=2.5)
-        signals = strategy.generate_signals(predictions, baseline)
-        assert (signals == 2.5).all()
+        prices = pd.Series(np.arange(24, dtype=float), index=idx)
+        strategy = RankSpreadStrategy(n_long=4, n_short=4, position_mwh=2.5)
+        signals = strategy.generate_signals(prices)
+        assert signals.max() == 2.5
+        assert signals.min() == -2.5
 
 
 # --- backtest metrics ---
@@ -217,7 +222,7 @@ class TestBacktestEngine:
     def test_run_returns_dataframe(self, small_feature_matrix):
         engine = BacktestEngine(
             training_window_days=3,
-            strategy=ThresholdStrategy(threshold_eur=5.0),
+            strategy=RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0),
         )
         results = engine.run(small_feature_matrix)
         assert isinstance(results, pd.DataFrame)
@@ -225,10 +230,10 @@ class TestBacktestEngine:
     def test_result_columns(self, small_feature_matrix):
         engine = BacktestEngine(
             training_window_days=3,
-            strategy=ThresholdStrategy(threshold_eur=5.0),
+            strategy=RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0),
         )
         results = engine.run(small_feature_matrix)
-        expected_cols = {"predicted_price", "actual_price", "baseline_price", "position", "pnl"}
+        expected_cols = {"predicted_price", "actual_price", "position", "pnl"}
         assert expected_cols == set(results.columns)
 
     def test_no_results_with_insufficient_data(self):
@@ -246,15 +251,15 @@ class TestBacktestEngine:
     def test_results_are_sorted(self, small_feature_matrix):
         engine = BacktestEngine(
             training_window_days=3,
-            strategy=ThresholdStrategy(threshold_eur=5.0),
+            strategy=RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0),
         )
         results = engine.run(small_feature_matrix)
         if len(results) > 0:
             assert results.index.is_monotonic_increasing
 
     def test_backtest_with_transaction_costs(self, small_feature_matrix):
-        strategy_no_cost = ThresholdStrategy(threshold_eur=5.0, transaction_cost_eur_mwh=0.0)
-        strategy_with_cost = ThresholdStrategy(threshold_eur=5.0, transaction_cost_eur_mwh=1.0)
+        strategy_no_cost = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.0)
+        strategy_with_cost = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=1.0)
 
         engine_no_cost = BacktestEngine(training_window_days=3, strategy=strategy_no_cost)
         engine_with_cost = BacktestEngine(training_window_days=3, strategy=strategy_with_cost)

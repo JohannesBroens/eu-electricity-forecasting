@@ -35,8 +35,7 @@ from da_forecast.features.build import build_feature_matrix
 from da_forecast.features.lags import compute_lag_features
 from da_forecast.features.calendar import compute_calendar_features
 from da_forecast.models.xgboost_da import DayAheadForecaster
-from da_forecast.models.evaluation import naive_baseline
-from da_forecast.backtest.strategies import ThresholdStrategy
+from da_forecast.backtest.strategies import RankSpreadStrategy
 from da_forecast.backtest.metrics import backtest_summary
 
 CACHE_DIR = Path(__file__).parent.parent / "data" / "backtest_cache"
@@ -97,18 +96,13 @@ def run_single_day(features, test_date, target_col, training_window, strategy):
     forecaster.train(train_data, target_col=target_col)
     predictions = forecaster.predict(test_data[feature_cols])
     actuals = test_data[target_col]
-    baseline = naive_baseline(features[target_col]).reindex(test_data.index)
 
-    signals = strategy.generate_signals(predictions, baseline.fillna(predictions))
-    pnl = signals * (actuals - baseline.fillna(actuals))
-
-    if hasattr(strategy, "transaction_cost_eur_mwh") and strategy.transaction_cost_eur_mwh > 0:
-        pnl -= signals.abs() * strategy.transaction_cost_eur_mwh
+    signals = strategy.generate_signals(predictions)
+    pnl = strategy.compute_pnl(predictions, actuals)
 
     return pd.DataFrame({
         "predicted_price": predictions,
         "actual_price": actuals,
-        "baseline_price": baseline,
         "position": signals,
         "pnl": pnl,
     })
@@ -118,7 +112,7 @@ def backtest_zone(zone: str, n_samples: int, cache_dir: Path, refresh: bool) -> 
     """Run sampled backtest for one zone. Returns summary dict."""
     target_col = "price_eur_mwh"
     training_window = 56
-    strategy = ThresholdStrategy(threshold_eur=5.0, transaction_cost_eur_mwh=0.04, max_daily_trades=12)
+    strategy = RankSpreadStrategy(n_long=4, n_short=4, transaction_cost_eur_mwh=0.04)
 
     cache_file = cache_dir / f"{zone}_backtest.parquet"
     cached_dates = set()

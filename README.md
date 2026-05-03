@@ -83,7 +83,7 @@ jupyter notebook notebooks/
 The pipeline includes a walk-forward backtest that simulates a threshold-based trading strategy using the model's predictions. **These are simulation results, not real or projected trading performance.** The backtest uses a simplistic reference price and assumes perfect execution at clearing prices -- conditions that do not hold in practice.
 
 Key limitations (see `scripts/fast_backtest.py` for implementation):
-- Reference price is previous-day same-hour, not the actual market consensus
+- Reference price is the similar-day naive (D-1 same hour on weekdays, D-7 on weekends) -- better than a random guess but still not the actual market consensus that informed participants would use
 - No modelling of market entry mechanics or counterparty availability
 - No imbalance costs, collateral costs, or execution slippage
 - Sharpe ratios are unrealistically high (~15-25 vs real-world 1-3)

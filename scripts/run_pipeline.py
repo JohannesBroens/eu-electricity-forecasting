@@ -291,13 +291,13 @@ def step_backtest(features: pd.DataFrame, zone: str) -> dict | None:
         return None
 
     from da_forecast.backtest.engine import BacktestEngine
-    from da_forecast.backtest.strategies import ThresholdStrategy
+    from da_forecast.backtest.strategies import RankSpreadStrategy
     from da_forecast.backtest.metrics import backtest_summary
 
-    strategy = ThresholdStrategy(
-        threshold_eur=DEFAULT_THRESHOLD_EUR,
+    strategy = RankSpreadStrategy(
+        n_long=4,
+        n_short=4,
         transaction_cost_eur_mwh=DEFAULT_TRANSACTION_COST_EUR_MWH,
-        max_daily_trades=DEFAULT_MAX_DAILY_TRADES,
     )
     has_fundamentals = features.shape[1] > 14
     window = 56 if has_fundamentals else 30

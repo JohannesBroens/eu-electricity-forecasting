@@ -25,7 +25,28 @@ def smape(actual: np.ndarray, predicted: np.ndarray) -> float:
 
 
 def naive_baseline(prices: pd.Series) -> pd.Series:
-    return prices.shift(168)
+    """Similar-day reference price (standard in EPF literature).
+
+    - Tuesday through Friday: same hour yesterday (D-1, shift 24)
+    - Saturday, Sunday, Monday: same hour last week (D-7, shift 168)
+
+    This is NOT "market consensus" -- it's the simplest reasonable
+    reference that a trader could construct from public data. Real
+    market expectations would be harder to beat.
+
+    Source: Lago et al. (2021), "Forecasting day-ahead electricity prices",
+    Applied Energy 293. (epftoolbox implementation)
+    """
+    d1 = prices.shift(24)    # yesterday same hour
+    d7 = prices.shift(168)   # last week same hour
+
+    # Use D-1 for Tue-Fri, D-7 for Sat/Sun/Mon
+    day_of_week = prices.index.dayofweek  # Mon=0, Sun=6
+    use_weekly = (day_of_week == 0) | (day_of_week == 5) | (day_of_week == 6)
+
+    result = d1.copy()
+    result[use_weekly] = d7[use_weekly]
+    return result
 
 
 def evaluation_report(

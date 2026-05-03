@@ -6,14 +6,97 @@ import pandas as pd
 import numpy as np
 
 
-class ThresholdStrategy:
-    """Trade when predicted price diverges from baseline by more than threshold.
+class RankSpreadStrategy:
+    """Rank-based intra-day spread strategy. No reference price needed.
+
+    Each day, the model ranks 24 hours by predicted price. The strategy
+    buys the cheapest N hours and sells the most expensive N hours.
+    P&L comes from the actual price spread between sell and buy hours.
+
+    This is the most honest backtest: profit depends entirely on whether
+    the model correctly identifies which hours are cheap vs expensive.
+    No arbitrary baseline, no made-up reference price.
 
     Args:
-        threshold_eur: Minimum predicted advantage to trigger a trade.
-        position_mwh: Size of each trade in MWh.
-        transaction_cost_eur_mwh: Cost per MWh traded (Nord Pool ~0.04 EUR/MWh).
-        max_daily_trades: Maximum hourly trades per calendar day (capital constraint).
+        n_long: Number of cheapest hours to buy per day.
+        n_short: Number of most expensive hours to sell per day.
+        position_mwh: Size of each position in MWh.
+        transaction_cost_eur_mwh: Cost per MWh traded.
+    """
+
+    def __init__(
+        self,
+        n_long: int = 4,
+        n_short: int = 4,
+        position_mwh: float = 1.0,
+        transaction_cost_eur_mwh: float = 0.04,
+    ):
+        self.n_long = n_long
+        self.n_short = n_short
+        self.position_mwh = position_mwh
+        self.transaction_cost_eur_mwh = transaction_cost_eur_mwh
+
+    def generate_signals(self, predictions: pd.Series) -> pd.Series:
+        """Generate positions from predictions alone. No baseline needed."""
+        signals = pd.Series(0.0, index=predictions.index)
+        dates = predictions.index.normalize()
+
+        for day in dates.unique():
+            day_mask = dates == day
+            day_preds = predictions[day_mask]
+
+            if len(day_preds) < self.n_long + self.n_short:
+                continue
+
+            # Rank hours by predicted price
+            ranked = day_preds.rank()
+
+            # Buy cheapest N hours (long), sell most expensive N hours (short)
+            buy_hours = ranked.nsmallest(self.n_long).index
+            sell_hours = ranked.nlargest(self.n_short).index
+
+            signals.loc[buy_hours] = self.position_mwh
+            signals.loc[sell_hours] = -self.position_mwh
+
+        return signals
+
+    def compute_pnl(self, predictions: pd.Series, actuals: pd.Series) -> pd.Series:
+        """Compute P&L directly from positions and actual clearing prices.
+
+        For long positions: profit when actual price is below daily mean
+            (bought cheap, will sell at average or better)
+        For short positions: profit when actual price is above daily mean
+            (sold expensive, will buy back at average or lower)
+
+        Long (buy) profits when actual < daily mean (bought cheap).
+        Short (sell) profits when actual > daily mean (sold expensive).
+
+        P&L per hour = -position * (actual_price - daily_mean_actual)
+        """
+        signals = self.generate_signals(predictions)
+
+        # Use daily mean of actual prices as the settlement reference.
+        # This is NOT a baseline prediction -- it's the arithmetic fact of
+        # what the average price was that day.
+        daily_mean = actuals.groupby(actuals.index.normalize()).transform("mean")
+
+        # Long (buy cheap): profit = daily_mean - actual (positive when actual < mean)
+        # Short (sell expensive): profit = actual - daily_mean (positive when actual > mean)
+        pnl = -signals * (actuals - daily_mean)
+
+        # Transaction costs
+        if self.transaction_cost_eur_mwh > 0:
+            pnl -= signals.abs() * self.transaction_cost_eur_mwh
+
+        return pnl
+
+
+class ThresholdStrategy:
+    """Legacy: trade when predicted price diverges from baseline.
+
+    DEPRECATED: This strategy requires an arbitrary reference price
+    (baseline) which makes the backtest results unreliable. Use
+    RankSpreadStrategy instead for honest evaluation.
     """
 
     def __init__(
@@ -48,28 +131,4 @@ class ThresholdStrategy:
                     drop_mask = day_mask & (signals != 0) & (~signals.index.isin(ranked.index))
                     signals[drop_mask] = 0.0
 
-        return signals
-
-
-class SpreadStrategy:
-    def __init__(
-        self,
-        threshold_eur: float = 5.0,
-        lookback_days: int = 30,
-        position_mwh: float = 1.0,
-    ):
-        self.threshold_eur = threshold_eur
-        self.lookback_days = lookback_days
-        self.position_mwh = position_mwh
-
-    def generate_signals(
-        self, predicted_spread: pd.Series, historical_spread: pd.Series
-    ) -> pd.Series:
-        rolling_avg = historical_spread.rolling(
-            window=self.lookback_days * 24, min_periods=24
-        ).mean()
-        deviation = predicted_spread - rolling_avg.reindex(predicted_spread.index)
-        signals = pd.Series(0.0, index=predicted_spread.index)
-        signals[deviation > self.threshold_eur] = self.position_mwh
-        signals[deviation < -self.threshold_eur] = -self.position_mwh
         return signals
